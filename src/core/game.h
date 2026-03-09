@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config.h"
+#include "../sprites/grass.h"
 
 class Game
 {
@@ -9,6 +10,7 @@ public:
     SDL_Window *window = nullptr;
     SDL_Event event;
     bool active;
+    vector<Grass *> grasses;
     Game();
     void launch();
     void render();
