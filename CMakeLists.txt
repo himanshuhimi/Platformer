@@ -7,6 +7,10 @@ set(LIBRARIES
     tinyxml2
 )
 set(LINK_TARGETS "")
+set(DIRECTORIES
+    assets
+    maps
+)
 
 foreach(lib ${LIBRARIES})
     find_package(${lib} REQUIRED)
@@ -30,3 +34,10 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
     ${LINK_TARGETS}
 )
+foreach(directory ${DIRECTORIES})
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/${directory}
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/${directory}
+    )
+endforeach()
