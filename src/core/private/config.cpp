@@ -1,5 +1,7 @@
 #include "../config.h"
 
+int VERSION = 1.0;
+
 const char *TITLE = "Platformer";
 int DEF_WIDTH{640}, DEF_HEIGHT{360}, WIDTH{1920}, HEIGHT{1080};
 int SCALE{(int)sqrt((WIDTH * HEIGHT) / (DEF_WIDTH * DEF_HEIGHT))};

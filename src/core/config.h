@@ -12,7 +12,7 @@ using std::string, std::vector;
 using namespace tinyxml2;
 
 extern const char *TITLE;
-extern int DEF_WIDTH, DEF_HEIGHT, WIDTH, HEIGHT, SCALE;
+extern int VERSION, DEF_WIDTH, DEF_HEIGHT, WIDTH, HEIGHT, SCALE;
 void log(string message);
 struct Image
 {
