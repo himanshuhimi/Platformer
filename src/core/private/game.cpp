@@ -10,8 +10,15 @@ Game::Game()
     renderer = SDL_CreateRenderer(window, NULL);
     if (!renderer)
         log("Renderer Error");
-    for (int x = 0; x <= WIDTH; x += 16)
-        grasses.push_back(new Grass(renderer, x, HEIGHT - 32));
+    Grass *dumGrass = new Grass(renderer, 0, 0);
+    player = new Player(renderer, 32, HEIGHT - dumGrass->rect.h * 2);
+    for (int x = 0; x < WIDTH; x += dumGrass->rect.w)
+        player->grasses.push_back(new Grass(renderer, x, HEIGHT - dumGrass->rect.h));
+    carrots.push_back(new Carrot(
+        renderer,
+        (float)WIDTH / 2,
+        (float)HEIGHT - dumGrass->rect.h));
+    delete dumGrass;
     active = true;
 }
 
@@ -27,14 +34,19 @@ void Game::launch()
 void Game::render()
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 2, 4, 118, 255);
     SDL_RenderClear(renderer);
-    for (Grass *grass : grasses)
+    player->render();
+    for (Grass *grass : player->grasses)
         grass->render();
+    for (Carrot *carrot : carrots)
+        carrot->render();
     SDL_RenderPresent(renderer);
 }
 
 void Game::handle()
 {
+    deltaTime = calcDeltaTime();
     while (SDL_PollEvent(&event))
     {
         switch (event.type)
@@ -43,10 +55,25 @@ void Game::handle()
             terminate();
         }
     }
+    player->handle(deltaTime);
+    for (Carrot *carrot : carrots)
+        if (SDL_HasRectIntersectionFloat(&player->rect, &carrot->rect))
+        {
+            player->carrotsEarned.push_back(carrot);
+            delete carrot;
+        }
 }
 
 void Game::terminate()
 {
     SDL_Quit();
     active = false;
+}
+
+double Game::calcDeltaTime()
+{
+    NOW = SDL_GetPerformanceCounter();
+    double dt = (double)(NOW - LAST) / SDL_GetPerformanceFrequency();
+    LAST = NOW;
+    return dt;
 }

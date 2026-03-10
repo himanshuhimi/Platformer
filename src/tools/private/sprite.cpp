@@ -14,9 +14,11 @@ void Sprite::handle(double deltaTime)
 {
     Position.x += Vector.x * speed * deltaTime;
     Position.y += Vector.y * speed * deltaTime;
+    rect.x = Position.x;
+    rect.y = Position.y;
 }
 
-void Sprite::render() 
+void Sprite::render()
 {
     SDL_RenderTexture(renderer, image.texture, NULL, &rect);
 }
