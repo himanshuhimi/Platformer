@@ -56,12 +56,16 @@ void Game::handle()
         }
     }
     player->handle(deltaTime);
-    for (Carrot *carrot : carrots)
+    for (auto it = carrots.begin(); it != carrots.end();)
+    {
+        Carrot *carrot = *it;
         if (SDL_HasRectIntersectionFloat(&player->rect, &carrot->rect))
         {
             player->carrotsEarned.push_back(carrot);
             delete carrot;
-        }
+            it = carrots.erase(it);
+        } else ++it;
+    }
 }
 
 void Game::terminate()
