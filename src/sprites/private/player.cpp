@@ -3,7 +3,9 @@
 Player::Player(SDL_Renderer *renderer, float x, float y)
     : Sprite(renderer, "assets/images/player.png", x, y)
 {
-    speed = 300;
+    speed = 100 * SCALE;
+    jumpForce = 4.0f * SCALE;
+    gravity = 49.0f * SCALE;
 };
 
 void Player::handle(double deltaTime)

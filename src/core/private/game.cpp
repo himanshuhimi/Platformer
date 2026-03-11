@@ -23,11 +23,16 @@ Game::Game()
         (float)WIDTH / 2,
         (float)HEIGHT - dumGrass->rect.h));
     delete dumGrass;
+    carrots.push_back(new Carrot(
+        renderer,
+        30,
+        96
+    ));
     pointsText = new Text(
         renderer,
         std::to_string(player->points),
-        20,
-        20,
+        80,
+        70,
         SDL_Color{255, 255, 255, 255}
     );
     pointsText->pixelSize *= SCALE;
@@ -51,9 +56,17 @@ void Game::render()
     player->render();
     for (Grass *grass : player->grasses)
         grass->render();
+    RenderRectangle(
+        renderer,
+        SDL_Color{60, 60, 60, 255},
+        80,
+        48,
+        60,
+        60
+    );
+    pointsText->render();
     for (Carrot *carrot : carrots)
         carrot->render();
-    pointsText->render();
     SDL_RenderPresent(renderer);
 }
 

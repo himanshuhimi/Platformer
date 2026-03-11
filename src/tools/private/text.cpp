@@ -12,7 +12,6 @@ Text::Text(
 : renderer(renderer), x(x), y(y), color(color), pixelSize(pixelSize)
 {
     pixelSize *= SCALE;
-    log(std::to_string(pixelSize));
     font = TTF_OpenFont(fontSource.c_str(), pixelSize);
     if (!font)
         log("Font Uninitialized: " + fontSource);
@@ -25,7 +24,7 @@ Text::Text(
     textTexture = createTextureFromSurface(renderer, textSurface);
     SDL_DestroySurface(textSurface);
     SDL_GetTextureSize(textTexture, &rect.w, &rect.h);
-    rect.x = x;
+    rect.x = x - rect.w;
     rect.y = y;
 }
 

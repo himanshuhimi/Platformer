@@ -36,3 +36,11 @@ struct Cooldown
 };
 void log(string message);
 SDL_Texture *createTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface);
+void RenderRectangle(
+    SDL_Renderer *renderer,
+    SDL_Color color,
+    float width,
+    float height,
+    float x,
+    float y
+);

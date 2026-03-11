@@ -9,7 +9,7 @@ class Player : public Sprite
 {
 public:
     int points = 0;
-    float jumpForce{5.0f}, gravity{98.0f};
+    float jumpForce, gravity;
     bool onGround, spacePressed;
     vector<Grass *> grasses, collidedGrasses;
     vector<Carrot *> carrotsEarned;
