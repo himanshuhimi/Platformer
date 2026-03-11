@@ -6,5 +6,7 @@
 class Carrot : public Sprite
 {
 public:
+    bool taken = false;
     Carrot(SDL_Renderer *renderer, float x, float y);
+    void render();
 };

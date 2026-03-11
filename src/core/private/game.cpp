@@ -3,13 +3,17 @@
 Game::Game()
 {
     if (!SDL_Init(SDL_INIT_VIDEO))
-        log("SDL Error" + (string)SDL_GetError());
-    window = SDL_CreateWindow(TITLE, WIDTH, HEIGHT, 0);
-    if (!window)
-        log("Window Error");
-    renderer = SDL_CreateRenderer(window, NULL);
-    if (!renderer)
-        log("Renderer Error");
+        log("SDL Uninitialized: " + (string)SDL_GetError());
+    else
+        log("SDL Initiliazed");
+    if (!TTF_Init())
+        log("TTF Uninitialized: " + (string)SDL_GetError());
+    else
+        log("TTF Initialized");
+    if (!SDL_CreateWindowAndRenderer(TITLE, WIDTH, HEIGHT, 0, &window, &renderer))
+        log("Display Uninitialized: " + (string)SDL_GetError());
+    else
+        log("Display Initialized");
     Grass *dumGrass = new Grass(renderer, 0, 0);
     player = new Player(renderer, 32, HEIGHT - dumGrass->rect.h * 2);
     for (int x = 0; x < WIDTH; x += dumGrass->rect.w)
@@ -19,6 +23,14 @@ Game::Game()
         (float)WIDTH / 2,
         (float)HEIGHT - dumGrass->rect.h));
     delete dumGrass;
+    pointsText = new Text(
+        renderer,
+        std::to_string(player->points),
+        20,
+        20,
+        SDL_Color{255, 255, 255, 255}
+    );
+    pointsText->pixelSize *= SCALE;
     active = true;
 }
 
@@ -34,13 +46,14 @@ void Game::launch()
 void Game::render()
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_SetRenderDrawColor(renderer, 2, 4, 118, 255);
+    SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
     SDL_RenderClear(renderer);
     player->render();
     for (Grass *grass : player->grasses)
         grass->render();
     for (Carrot *carrot : carrots)
         carrot->render();
+    pointsText->render();
     SDL_RenderPresent(renderer);
 }
 
@@ -62,15 +75,15 @@ void Game::handle()
         if (SDL_HasRectIntersectionFloat(&player->rect, &carrot->rect))
         {
             player->carrotsEarned.push_back(carrot);
-            delete carrot;
+            carrot->taken = true;
             it = carrots.erase(it);
         } else ++it;
     }
+    pointsText->update(std::to_string(player->points));
 }
 
 void Game::terminate()
 {
-    SDL_Quit();
     active = false;
 }
 
@@ -80,4 +93,16 @@ double Game::calcDeltaTime()
     double dt = (double)(NOW - LAST) / SDL_GetPerformanceFrequency();
     LAST = NOW;
     return dt;
+}
+
+Game::~Game()
+{
+    if (!active) return;
+    delete pointsText;
+    delete player;
+    for (Carrot *carrot : carrots)
+        delete carrot;
+    carrots.clear();
+    TTF_Quit();
+    SDL_Quit();
 }

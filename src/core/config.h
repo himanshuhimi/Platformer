@@ -4,8 +4,10 @@
 #include <vector>
 #include <cmath>
 #include <unordered_map>
+#include <string>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <tinyxml2.h>
 
 using std::string, std::vector;
@@ -13,7 +15,6 @@ using namespace tinyxml2;
 
 extern const char *TITLE;
 extern int VERSION, DEF_WIDTH, DEF_HEIGHT, WIDTH, HEIGHT, SCALE;
-void log(string message);
 struct Image
 {
     string source;
@@ -33,3 +34,5 @@ struct Cooldown
     float duration{0.0f}, timeElapsed{0.0f};
     Cooldown(float duration) : duration(duration) {};
 };
+void log(string message);
+SDL_Texture *createTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface);

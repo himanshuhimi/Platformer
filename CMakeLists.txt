@@ -4,6 +4,7 @@ project(Platformer)
 set(LIBRARIES
     SDL3
     SDL3_image
+    SDL3_ttf
     tinyxml2
 )
 set(LINK_TARGETS "")

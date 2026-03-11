@@ -7,3 +7,8 @@ Carrot::Carrot(SDL_Renderer *renderer, float x, float y)
     rect.h *= 2;
     rect.y -= rect.h;
 }
+
+void Carrot::render()
+{
+    if (!taken) Sprite::render();
+}

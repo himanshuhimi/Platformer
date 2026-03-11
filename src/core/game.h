@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "../sprites/player.h"
+#include "../tools/text.h"
 
 class Game
 {
@@ -15,10 +16,12 @@ public:
     Uint64 LAST = SDL_GetPerformanceCounter();
     Uint64 NOW;
     vector<Carrot *> carrots;
+    Text *pointsText = nullptr;
     Game();
     void launch();
     void render();
     void handle();
     void terminate();
     double calcDeltaTime();
+    ~Game();
 };
