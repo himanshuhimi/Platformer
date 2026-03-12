@@ -15,27 +15,8 @@ Game::Game()
     else
         log("Display Initialized");
     Grass *dumGrass = new Grass(renderer, 0, 0);
-    player = new Player(renderer, 32, HEIGHT - dumGrass->rect.h * 2);
-    for (int x = 0; x < WIDTH; x += dumGrass->rect.w)
-        player->grasses.push_back(new Grass(renderer, x, HEIGHT - dumGrass->rect.h));
-    carrots.push_back(new Carrot(
-        renderer,
-        (float)WIDTH / 2,
-        (float)HEIGHT - dumGrass->rect.h));
-    delete dumGrass;
-    carrots.push_back(new Carrot(
-        renderer,
-        30,
-        96
-    ));
-    pointsText = new Text(
-        renderer,
-        std::to_string(player->points),
-        80,
-        70,
-        SDL_Color{255, 255, 255, 255}
-    );
-    pointsText->pixelSize *= SCALE;
+    map = new Map(renderer, "maps/1.tmx");
+    manageGroups();
     active = true;
 }
 
@@ -50,23 +31,31 @@ void Game::launch()
 
 void Game::render()
 {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
     SDL_RenderClear(renderer);
-    player->render();
-    for (Grass *grass : player->grasses)
-        grass->render();
-    RenderRectangle(
-        renderer,
-        SDL_Color{60, 60, 60, 255},
-        80,
-        48,
-        60,
-        60
-    );
-    pointsText->render();
-    for (Carrot *carrot : carrots)
-        carrot->render();
+    map->render();
+    if (player != nullptr)
+    {
+        for (Grass *grass : player->grasses)
+            grass->render();
+        player->render();
+    }
+    if (!carrots.empty())
+        for (Carrot *carrot : carrots)
+            if (!carrot->taken)
+                carrot->render();
+    for (auto it = carrots.begin(); it != carrots.end();)
+    {
+        Carrot *carrot = *it;
+        if (SDL_HasRectIntersectionFloat(&player->rect, &carrot->rect))
+        {
+            player->carrotsEarned.push_back(carrot);
+            carrot->taken = true;
+            it = carrots.erase(it);
+        }
+        else
+            ++it;
+    }
     SDL_RenderPresent(renderer);
 }
 
@@ -81,18 +70,16 @@ void Game::handle()
             terminate();
         }
     }
-    player->handle(deltaTime);
-    for (auto it = carrots.begin(); it != carrots.end();)
+    if (player != nullptr)
     {
-        Carrot *carrot = *it;
-        if (SDL_HasRectIntersectionFloat(&player->rect, &carrot->rect))
-        {
-            player->carrotsEarned.push_back(carrot);
-            carrot->taken = true;
-            it = carrots.erase(it);
-        } else ++it;
+        for (Grass *grass : player->grasses)
+            grass->handle(deltaTime);
+        player->handle(deltaTime);
     }
-    pointsText->update(std::to_string(player->points));
+    if (!carrots.empty())
+        for (Carrot *carrot : carrots)
+            if (!carrot->taken)
+                carrot->handle(deltaTime);
 }
 
 void Game::terminate()
@@ -108,14 +95,34 @@ double Game::calcDeltaTime()
     return dt;
 }
 
+void Game::manageGroups()
+{
+    Grass *dumGrass = new Grass(renderer, 0, 0);
+    float grassWidth = dumGrass->image.width;
+    float grassHeight = dumGrass->image.height;
+    delete dumGrass;
+    for (Map::Object object : map->objectGroup.objects)
+        if (object.name == "player")
+            player = new Player(renderer, object.x, object.y);
+    for (Map::Object object : map->objectGroup.objects)
+    {
+        if (object.name == "grasses")
+        {
+            for (int x = 0; x < object.width; x += grassWidth)
+            {
+                Grass *grass = new Grass(renderer, object.x + x, object.y);
+                player->grasses.emplace_back(grass);
+            }
+        }
+        else if (object.name == "carrot")
+            carrots.emplace_back(new Carrot(renderer, object.x, object.y - grassHeight));
+    }
+}
+
 Game::~Game()
 {
-    if (!active) return;
-    delete pointsText;
-    delete player;
-    for (Carrot *carrot : carrots)
-        delete carrot;
-    carrots.clear();
+    if (!active)
+        return;
     TTF_Quit();
     SDL_Quit();
 }

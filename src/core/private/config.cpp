@@ -12,8 +12,6 @@ Image::Image(SDL_Renderer *renderer, string source) : source(source)
         log("Texture Uninitialized: " + source);
     else
         SDL_GetTextureSize(texture, &width, &height);
-    width *= SCALE;
-    height *= SCALE;
 }
 Image::~Image()
 {

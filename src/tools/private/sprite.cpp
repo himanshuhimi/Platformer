@@ -6,8 +6,8 @@ Sprite::Sprite(SDL_Renderer *renderer, string imageSource, float x, float y)
     Position = Vector2D(x, y);
     rect.x = Position.x;
     rect.y = Position.y;
-    rect.w = image.width;
-    rect.h = image.height;
+    rect.w = image.width * SCALE;
+    rect.h = image.height * SCALE;
 }
 
 void Sprite::handle(double deltaTime)
