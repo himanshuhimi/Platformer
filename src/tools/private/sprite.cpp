@@ -3,7 +3,7 @@
 Sprite::Sprite(SDL_Renderer *renderer, string imageSource, float x, float y)
     : renderer(renderer), image(renderer, imageSource)
 {
-    Position = Vector2D(x, y);
+    Position = Vector2D(x * SCALE, y * SCALE);
     rect.x = Position.x;
     rect.y = Position.y;
     rect.w = image.width * SCALE;

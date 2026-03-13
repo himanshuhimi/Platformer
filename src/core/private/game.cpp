@@ -110,12 +110,18 @@ void Game::manageGroups()
         {
             for (int x = 0; x < object.width; x += grassWidth)
             {
-                Grass *grass = new Grass(renderer, object.x + x, object.y);
+                Grass *grass = new Grass(renderer, (object.x + x), object.y );
                 player->grasses.emplace_back(grass);
             }
         }
-        else if (object.name == "carrot")
-            carrots.emplace_back(new Carrot(renderer, object.x, object.y - grassHeight));
+        else if (object.name == "carrot") {
+            Carrot *carrot = new Carrot(
+                renderer,
+                object.x,
+                (object.y - grassHeight)
+            );
+            carrots.emplace_back(carrot);
+        }
     }
 }
 
