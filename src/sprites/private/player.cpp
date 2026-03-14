@@ -4,14 +4,14 @@ Player::Player(SDL_Renderer *renderer, float x, float y)
     : Sprite(renderer, "assets/images/player.png", x, y)
 {
     speed = 100 * SCALE;
-    jumpForce = 8.0f * SCALE;
-    gravity = 49.0f * SCALE;
+    jumpForce = 490.0f * SCALE;
+    gravity = 980.0f * SCALE;
 };
 
 void Player::handle(double deltaTime)
 {
     const bool *keys = SDL_GetKeyboardState(NULL);
-    Vector.x = -((int)keys[SDL_SCANCODE_A] - (int)keys[SDL_SCANCODE_D]);
+    Vector.x = -((int)keys[SDL_SCANCODE_A] - (int)keys[SDL_SCANCODE_D]) * speed;
     Sprite::handle(deltaTime);
     collidedGrasses.clear();
     for (Grass *grass : grasses)

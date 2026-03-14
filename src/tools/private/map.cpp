@@ -42,7 +42,8 @@ void Map::loadLayer(XMLElement *child)
             layer.num += c;
         else if (c == ',' || c == '\n')
         {
-            if (!layer.num.empty()) {
+            if (!layer.num.empty())
+            {
                 layer.gids.push_back(std::stoi(layer.num));
                 layer.num.clear();
             }
@@ -77,9 +78,8 @@ void Map::loadTileset(XMLElement *child)
         return;
     }
     tileset.image = new Image(
-        renderer, 
-        "maps/tilesets/" + (string)imageElement->Attribute("source")
-    );
+        renderer,
+        "maps/tilesets/" + (string)imageElement->Attribute("source"));
     tileset.columns = tileset.image->width / tileWidth;
     tileset.rows = tileset.image->height / tileHeight;
 }

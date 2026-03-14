@@ -8,5 +8,6 @@ Carrot::Carrot(SDL_Renderer *renderer, float x, float y)
 
 void Carrot::render()
 {
-    if (!taken) Sprite::render();
+    if (!taken)
+        Sprite::render();
 }

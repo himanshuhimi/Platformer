@@ -42,5 +42,4 @@ void RenderRectangle(
     float width,
     float height,
     float x,
-    float y
-);
+    float y);

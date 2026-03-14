@@ -12,8 +12,8 @@ Sprite::Sprite(SDL_Renderer *renderer, string imageSource, float x, float y)
 
 void Sprite::handle(double deltaTime)
 {
-    Position.x += Vector.x * speed * deltaTime;
-    Position.y += Vector.y * speed * deltaTime;
+    Position.x += Vector.x * deltaTime;
+    Position.y += Vector.y * deltaTime;
     rect.x = Position.x;
     rect.y = Position.y;
 }

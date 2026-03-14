@@ -38,8 +38,7 @@ void RenderRectangle(
     float width,
     float height,
     float x,
-    float y
-)
+    float y)
 {
     SDL_FRect rect = {x - width / 2, y, width, height};
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);

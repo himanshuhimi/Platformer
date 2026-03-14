@@ -19,8 +19,7 @@ public:
         float y,
         SDL_Color color,
         string fontSource = "assets/fonts/normal.ttf",
-        int pixelSize = 18
-    );
+        int pixelSize = 18);
     void render();
     void update(string newText);
 };

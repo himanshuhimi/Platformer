@@ -7,20 +7,18 @@ Text::Text(
     float y,
     SDL_Color color,
     string fontSource,
-    int pixelSize
-) 
-: renderer(renderer), x(x), y(y), color(color), pixelSize(pixelSize)
+    int pixelSize)
+    : renderer(renderer), x(x), y(y), color(color), pixelSize(pixelSize)
 {
     pixelSize *= SCALE;
     font = TTF_OpenFont(fontSource.c_str(), pixelSize);
     if (!font)
         log("Font Uninitialized: " + fontSource);
     textSurface = TTF_RenderText_Blended(
-        font, 
-        data.c_str(), 
+        font,
+        data.c_str(),
         data.size(),
-        color
-    );
+        color);
     textTexture = createTextureFromSurface(renderer, textSurface);
     SDL_DestroySurface(textSurface);
     SDL_GetTextureSize(textTexture, &rect.w, &rect.h);
@@ -35,12 +33,12 @@ void Text::render()
 
 void Text::update(string newText)
 {
-    if (textTexture) SDL_DestroyTexture(textTexture);
+    if (textTexture)
+        SDL_DestroyTexture(textTexture);
     textSurface = TTF_RenderText_Blended(
         font,
         newText.c_str(),
         newText.size(),
-        color
-    );
+        color);
     textTexture = createTextureFromSurface(renderer, textSurface);
 }
