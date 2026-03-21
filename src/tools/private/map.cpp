@@ -93,10 +93,10 @@ void Map::loadObjectGroup(XMLElement *child)
     {
         Object object;
         object.name = objectElement->Attribute("name");
-        object.x = objectElement->IntAttribute("x");
-        object.y = objectElement->IntAttribute("y");
-        object.width = objectElement->IntAttribute("width");
-        object.height = objectElement->IntAttribute("height");
+        object.x = objectElement->FloatAttribute("x");
+        object.y = objectElement->FloatAttribute("y");
+        object.width = objectElement->FloatAttribute("width");
+        object.height = objectElement->FloatAttribute("height");
         object.width *= SCALE;
         object.height *= SCALE;
         objectGroup.objects.push_back(object);

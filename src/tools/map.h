@@ -25,7 +25,7 @@ public:
     struct Object
     {
         string name;
-        int x, y, width, height;
+        float x, y, width, height;
     };
     struct ObjectGroup
     {

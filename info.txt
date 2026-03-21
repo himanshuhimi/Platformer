@@ -1,1 +1,1 @@
-Universal Size = 8x8
+Universal Size = 32x32

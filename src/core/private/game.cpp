@@ -17,6 +17,12 @@ Game::Game()
     Grass *dumGrass = new Grass(renderer, 0, 0);
     map = new Map(renderer, "maps/1.tmx");
     manageGroups();
+    pointsText = new Text(
+        renderer, std::to_string(player->points),
+        WIDTH / 8, HEIGHT / 8,
+        SDL_Color{0, 0, 0, 255}
+    );
+    carrots.push_back(new Carrot(renderer, WIDTH / 8 - 60, HEIGHT / 8));
     active = true;
 }
 
@@ -56,6 +62,9 @@ void Game::render()
         else
             ++it;
     }
+    pointsText->update(std::to_string(player->points));
+    if (pointsText != nullptr)
+        pointsText->render();
     SDL_RenderPresent(renderer);
 }
 
@@ -98,8 +107,8 @@ double Game::calcDeltaTime()
 void Game::manageGroups()
 {
     Grass *dumGrass = new Grass(renderer, 0, 0);
-    float grassWidth = dumGrass->image.width;
-    float grassHeight = dumGrass->image.height;
+    float grassWidth = dumGrass->image->width;
+    float grassHeight = dumGrass->image->height;
     delete dumGrass;
     for (Map::Object object : map->objectGroup.objects)
         if (object.name == "player")
@@ -108,10 +117,14 @@ void Game::manageGroups()
     {
         if (object.name == "grasses")
         {
-            for (int x = 0; x < object.width; x += grassWidth)
+            int n = object.width / grassWidth;
+            for (int i = 0; i < n; i++)
             {
-                Grass *grass = new Grass(renderer, (object.x + x), object.y);
-                player->grasses.emplace_back(grass);
+                Grass *grass = new Grass(
+                    renderer,
+                    object.x + (i * grassWidth),
+                    object.y);
+                player->grasses.push_back(grass);
             }
         }
         else if (object.name == "carrot")
@@ -122,6 +135,8 @@ void Game::manageGroups()
                 (object.y - grassHeight));
             carrots.emplace_back(carrot);
         }
+        else if (object.name == "gate")
+            gate = new Gate(renderer, object.x, object.y - grassHeight);
     }
 }
 

@@ -1,7 +1,7 @@
 #include "../player.h"
 
 Player::Player(SDL_Renderer *renderer, float x, float y)
-    : Sprite(renderer, "assets/images/player.png", x, y)
+    : Sprite(renderer, "player/right.png", x, y)
 {
     speed = 100 * SCALE;
     jumpForce = 490.0f * SCALE;
@@ -45,6 +45,7 @@ void Player::handle(double deltaTime)
 void Player::render()
 {
     Sprite::render();
+    const bool *keys = SDL_GetKeyboardState(NULL);
     for (Carrot *carrot : carrotsEarned)
         carrot->render();
 }

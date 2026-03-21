@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "../sprites/player.h"
+#include "../sprites/gate.h"
 #include "../tools/text.h"
 #include "../tools/map.h"
 
@@ -17,6 +18,8 @@ public:
     Uint64 LAST = SDL_GetPerformanceCounter();
     Uint64 NOW;
     vector<Carrot *> carrots;
+    Text *pointsText = nullptr;
+    Gate *gate;
     Map *map;
     Game();
     void launch();

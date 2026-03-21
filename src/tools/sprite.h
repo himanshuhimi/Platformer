@@ -8,7 +8,8 @@ public:
     SDL_Renderer *renderer = nullptr;
     Vector2D Vector, Position;
     SDL_FRect rect;
-    Image image;
+    Image *image;
+    vector<Image> images;
     int speed = 0;
     Sprite(SDL_Renderer *renderer, string imageSource, float x, float y);
     virtual void handle(double deltaTime);

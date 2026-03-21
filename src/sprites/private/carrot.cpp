@@ -1,7 +1,7 @@
 #include "../carrot.h"
 
 Carrot::Carrot(SDL_Renderer *renderer, float x, float y)
-    : Sprite(renderer, "assets/images/carrot.png", x, y)
+    : Sprite(renderer, "carrot.png", x, y)
 {
     rect.y -= rect.h;
 }
