@@ -4,11 +4,12 @@
 #include "../tools/sprite.h"
 #include "grass.h"
 #include "carrot.h"
+#include "spike.h"
 
 class Player : public Sprite
 {
 public:
-    int points = 0;
+    int points = 0, health = 100;
     float jumpForce, gravity;
     bool onGround, spacePressed;
     vector<Grass *> grasses, collidedGrasses;
@@ -17,4 +18,5 @@ public:
     Player(SDL_Renderer *renderer, float x, float y);
     void handle(double deltaTime);
     void render();
+    void respawn();
 };

@@ -20,8 +20,7 @@ Game::Game()
     pointsText = new Text(
         renderer, std::to_string(player->points),
         WIDTH / 8, HEIGHT / 8,
-        SDL_Color{0, 0, 0, 255}
-    );
+        SDL_Color{0, 0, 0, 255});
     carrots.push_back(new Carrot(renderer, WIDTH / 8 - 60, HEIGHT / 8));
     active = true;
 }
@@ -40,31 +39,24 @@ void Game::render()
     SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
     SDL_RenderClear(renderer);
     map->render();
+    if (!carrots.empty())
+        for (Carrot *carrot : carrots)
+            if (!carrot->taken)
+                carrot->render();
+    if (!spikes.empty())
+        for (Spike *spike : spikes)
+            spike->render();
+    pointsText->update(std::to_string(player->points));
+    if (pointsText != nullptr)
+        pointsText->render();
+    if (gate != nullptr)
+        gate->render();
     if (player != nullptr)
     {
         for (Grass *grass : player->grasses)
             grass->render();
         player->render();
     }
-    if (!carrots.empty())
-        for (Carrot *carrot : carrots)
-            if (!carrot->taken)
-                carrot->render();
-    for (auto it = carrots.begin(); it != carrots.end();)
-    {
-        Carrot *carrot = *it;
-        if (SDL_HasRectIntersectionFloat(&player->rect, &carrot->rect))
-        {
-            player->carrotsEarned.push_back(carrot);
-            carrot->taken = true;
-            it = carrots.erase(it);
-        }
-        else
-            ++it;
-    }
-    pointsText->update(std::to_string(player->points));
-    if (pointsText != nullptr)
-        pointsText->render();
     SDL_RenderPresent(renderer);
 }
 
@@ -79,16 +71,44 @@ void Game::handle()
             terminate();
         }
     }
+    if (!carrots.empty())
+        for (Carrot *carrot : carrots)
+            if (!carrot->taken)
+                carrot->handle(deltaTime);
     if (player != nullptr)
     {
         for (Grass *grass : player->grasses)
             grass->handle(deltaTime);
         player->handle(deltaTime);
     }
-    if (!carrots.empty())
-        for (Carrot *carrot : carrots)
-            if (!carrot->taken)
-                carrot->handle(deltaTime);
+    for (auto it = carrots.begin(); it != carrots.end();)
+    {
+        Carrot *carrot = *it;
+        if (SDL_HasRectIntersectionFloat(&player->rect, &carrot->rect))
+        {
+            player->carrotsEarned.push_back(carrot);
+            carrot->taken = true;
+            it = carrots.erase(it);
+        }
+        else
+            ++it;
+    }
+    for (auto spikeIT = spikes.begin(); spikeIT != spikes.end();)
+    {
+        Spike *spike = *spikeIT;
+        if (SDL_HasRectIntersectionFloat(&player->rect, &spike->rect))
+        {
+            player->health = 0;
+            player->respawn();
+        }
+        else
+            ++spikeIT;
+    }
+    if (player->health < 0)
+    {
+        manageGroups();
+        player->respawn();
+    }
 }
 
 void Game::terminate()
@@ -110,12 +130,26 @@ void Game::manageGroups()
     float grassWidth = dumGrass->image->width;
     float grassHeight = dumGrass->image->height;
     delete dumGrass;
+    Spike *dumSpike = new Spike(renderer, 0, 0);
+    float spikeWidth = dumSpike->image->width;
+    float spikeHeight = dumSpike->image->width;
+    delete dumSpike;
     for (Map::Object object : map->objectGroup.objects)
         if (object.name == "player")
             player = new Player(renderer, object.x, object.y);
     for (Map::Object object : map->objectGroup.objects)
     {
-        if (object.name == "grasses")
+        if (object.name == "carrot")
+        {
+            Carrot *carrot = new Carrot(
+                renderer,
+                object.x,
+                (object.y - grassHeight));
+            carrots.emplace_back(carrot);
+        }
+        else if (object.name == "gate")
+            gate = new Gate(renderer, object.x, object.y - grassHeight);
+        else if (object.name == "grasses")
         {
             int n = object.width / grassWidth;
             for (int i = 0; i < n; i++)
@@ -127,16 +161,18 @@ void Game::manageGroups()
                 player->grasses.push_back(grass);
             }
         }
-        else if (object.name == "carrot")
+        else if (object.name == "spikes")
         {
-            Carrot *carrot = new Carrot(
-                renderer,
-                object.x,
-                (object.y - grassHeight));
-            carrots.emplace_back(carrot);
+            int n = object.width / spikeWidth;
+            for (int i = 0; i < n; i++)
+            {
+                Spike *spike = new Spike(
+                    renderer,
+                    object.x + (i * spikeWidth),
+                    object.y);
+                spikes.emplace_back(spike);
+            }
         }
-        else if (object.name == "gate")
-            gate = new Gate(renderer, object.x, object.y - grassHeight);
     }
 }
 

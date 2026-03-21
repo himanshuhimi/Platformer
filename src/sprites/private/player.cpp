@@ -49,3 +49,8 @@ void Player::render()
     for (Carrot *carrot : carrotsEarned)
         carrot->render();
 }
+
+void Player::respawn()
+{
+    health = 100;
+}

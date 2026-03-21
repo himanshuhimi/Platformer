@@ -18,6 +18,7 @@ public:
     Uint64 LAST = SDL_GetPerformanceCounter();
     Uint64 NOW;
     vector<Carrot *> carrots;
+    vector<Spike *> spikes;
     Text *pointsText = nullptr;
     Gate *gate;
     Map *map;
