@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="12" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="21">
+ <tileset firstgid="1" source="tilesets/1.tsx"/>
+ <layer id="1" name="base" width="20" height="12">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,2,3,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,2,3,0,0,5,6,0,0,2,3,0,0,0,0,0,
+2,1,3,0,0,5,6,8,8,5,6,8,8,5,6,0,0,2,1,3,
+5,4,6,0,0,5,4,4,4,4,4,4,4,4,6,0,0,5,4,6
+</data>
+ </layer>
+ <layer id="3" name="decor" width="20" height="12">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,7,7,0,0,7,7,0,0,0,0,0,0,0,
+7,7,7,0,0,7,7,7,7,7,7,7,7,7,7,0,0,7,7,7
+</data>
+ </layer>
+ <objectgroup id="5" name="objects">
+  <object id="1" name="grasses" x="0" y="320" width="96" height="32"/>
+  <object id="2" name="grasses" x="160" y="288" width="64" height="32"/>
+  <object id="3" name="grasses" x="288" y="256" width="64" height="32"/>
+  <object id="4" name="grasses" x="416" y="288" width="64" height="32"/>
+  <object id="5" name="grasses" x="544" y="320" width="96" height="32"/>
+  <object id="7" name="player" x="32" y="288">
+   <point/>
+  </object>
+  <object id="8" name="carrot" x="192" y="288">
+   <point/>
+  </object>
+  <object id="9" name="carrot" x="320" y="256">
+   <point/>
+  </object>
+  <object id="11" name="carrot" x="448" y="288">
+   <point/>
+  </object>
+  <object id="13" name="gate" x="591.333" y="320.667">
+   <point/>
+  </object>
+  <object id="19" name="spikes" x="352" y="320" width="64" height="32"/>
+  <object id="20" name="spikes" x="224" y="320" width="64" height="32"/>
+ </objectgroup>
+</map>

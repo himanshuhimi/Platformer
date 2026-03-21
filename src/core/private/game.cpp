@@ -14,14 +14,12 @@ Game::Game()
         log("Display Uninitialized: " + (string)SDL_GetError());
     else
         log("Display Initialized");
-    Grass *dumGrass = new Grass(renderer, 0, 0);
-    map = new Map(renderer, "maps/1.tmx");
-    manageGroups();
+    loadMaps();
     pointsText = new Text(
         renderer, std::to_string(player->points),
         WIDTH / 8, HEIGHT / 8,
         SDL_Color{0, 0, 0, 255});
-    carrots.push_back(new Carrot(renderer, WIDTH / 8 - 60, HEIGHT / 8));
+    log(std::to_string(carrots.size()));
     active = true;
 }
 
@@ -38,7 +36,7 @@ void Game::render()
 {
     SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
     SDL_RenderClear(renderer);
-    map->render();
+    currentMap->render();
     if (!carrots.empty())
         for (Carrot *carrot : carrots)
             if (!carrot->taken)
@@ -46,9 +44,11 @@ void Game::render()
     if (!spikes.empty())
         for (Spike *spike : spikes)
             spike->render();
-    pointsText->update(std::to_string(player->points));
     if (pointsText != nullptr)
+    {
+        pointsText->update(std::to_string(player->points));
         pointsText->render();
+    }
     if (gate != nullptr)
         gate->render();
     if (player != nullptr)
@@ -98,16 +98,24 @@ void Game::handle()
         Spike *spike = *spikeIT;
         if (SDL_HasRectIntersectionFloat(&player->rect, &spike->rect))
         {
-            player->health = 0;
             player->respawn();
+            break;
         }
         else
             ++spikeIT;
     }
-    if (player->health < 0)
+    if (gate != nullptr)
     {
-        manageGroups();
-        player->respawn();
+        if (SDL_HasRectIntersectionFloat(&player->rect, &gate->rect))
+        {
+            level += 1;
+            clear();
+            updateMap();
+            pointsText = new Text(
+                renderer, std::to_string(player->points),
+                WIDTH / 8, HEIGHT / 8,
+                SDL_Color{0, 0, 0, 255});
+        }
     }
 }
 
@@ -124,6 +132,26 @@ double Game::calcDeltaTime()
     return dt;
 }
 
+void Game::loadMaps()
+{
+    for (Map *map : maps)
+        delete map;
+    maps.clear();
+    string mapPath = "maps";
+    for (const auto &entry : std::filesystem::directory_iterator(mapPath))
+    {
+        string path = entry.path().string();
+        std::filesystem::path p(path);
+        string filename = p.stem().string();
+        bool isDigit = !filename.empty() && std::all_of(filename.begin(), filename.end(),
+                                                        [](unsigned char c)
+                                                        { return std::isdigit(c); });
+        if (isDigit)
+            maps.emplace_back(new Map(renderer, path));
+    }
+    updateMap();
+}
+
 void Game::manageGroups()
 {
     Grass *dumGrass = new Grass(renderer, 0, 0);
@@ -134,10 +162,10 @@ void Game::manageGroups()
     float spikeWidth = dumSpike->image->width;
     float spikeHeight = dumSpike->image->width;
     delete dumSpike;
-    for (Map::Object object : map->objectGroup.objects)
+    for (Map::Object object : currentMap->objectGroup.objects)
         if (object.name == "player")
             player = new Player(renderer, object.x, object.y);
-    for (Map::Object object : map->objectGroup.objects)
+    for (Map::Object object : currentMap->objectGroup.objects)
     {
         if (object.name == "carrot")
         {
@@ -172,6 +200,60 @@ void Game::manageGroups()
                     object.y);
                 spikes.emplace_back(spike);
             }
+        }
+    }
+}
+
+void Game::clear()
+{
+    if (!carrots.empty())
+    {
+        for (Carrot *carrot : carrots)
+            delete carrot;
+        carrots.clear();
+    }
+    if (!spikes.empty())
+    {
+        for (Spike *spike : spikes)
+            delete spike;
+        spikes.clear();
+    }
+    if (!player->grasses.empty())
+    {
+        for (Grass *grass : player->grasses)
+            delete grass;
+        player->grasses.clear();
+    }
+    if (player != nullptr)
+    {
+        player->carrotsEarned.clear();
+        delete player;
+        player = nullptr;
+    }
+    if (gate != nullptr)
+    {
+        delete gate;
+        gate = nullptr;
+    }
+    if (pointsText != nullptr)
+    {
+        delete pointsText;
+        pointsText = nullptr;
+    }
+}
+
+void Game::updateMap()
+{
+    if (!maps.empty() && currentMap == nullptr)
+        currentMap = maps.front();
+    for (Map *map : maps)
+    {
+        std::filesystem::path p(map->source);
+        if (p.stem().string() == std::to_string(level))
+        {
+            currentMap = map;
+            manageGroups();
+            break;
         }
     }
 }

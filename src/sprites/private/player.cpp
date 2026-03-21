@@ -1,7 +1,7 @@
 #include "../player.h"
 
 Player::Player(SDL_Renderer *renderer, float x, float y)
-    : Sprite(renderer, "player/right.png", x, y)
+    : Sprite(renderer, "player/right.png", x, y), spawnPos{x, y}
 {
     speed = 100 * SCALE;
     jumpForce = 490.0f * SCALE;
@@ -53,4 +53,6 @@ void Player::render()
 void Player::respawn()
 {
     health = 100;
+    Position = spawnPos;
+    Vector = {0, 0};
 }
