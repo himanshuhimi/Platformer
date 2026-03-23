@@ -5,6 +5,7 @@ int VERSION = 1.0;
 const char *TITLE = "Platformer";
 int DEF_WIDTH{640}, DEF_HEIGHT{360}, WIDTH{640}, HEIGHT{360};
 int SCALE{(int)sqrt((WIDTH * HEIGHT) / (DEF_WIDTH * DEF_HEIGHT))};
+float SPRITE_WIDTH{32.0f}, SPRITE_HEIGHT{32.0f};
 Image::Image(SDL_Renderer *renderer, string source) : source(source)
 {
     texture = IMG_LoadTexture(renderer, source.c_str());

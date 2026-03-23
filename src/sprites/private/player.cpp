@@ -8,7 +8,7 @@ Player::Player(SDL_Renderer *renderer, float x, float y)
     gravity = 980.0f * SCALE;
 };
 
-void Player::handle(double deltaTime)
+void Player::handle(double deltaTime, const vector<Grass *> &grasses)
 {
     const bool *keys = SDL_GetKeyboardState(NULL);
     Vector.x = -((int)keys[SDL_SCANCODE_A] - (int)keys[SDL_SCANCODE_D]) * speed;
@@ -40,6 +40,9 @@ void Player::handle(double deltaTime)
     jumpCooldown.timeElapsed += deltaTime;
     jumpCooldown.available = jumpCooldown.timeElapsed >= jumpCooldown.duration;
     points = carrotsEarned.size();
+    if (rect.y >= HEIGHT)
+        respawn();
+    log(std::to_string(Vector.x));
 }
 
 void Player::render()

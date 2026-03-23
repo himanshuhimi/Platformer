@@ -8,16 +8,18 @@
 #include <filesystem>
 #include <algorithm>
 #include <cctype>
+#include <functional>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <tinyxml2.h>
 
-using std::string, std::vector;
+using std::string, std::vector, std::function, std::unique_ptr, std::make_unique;
 using namespace tinyxml2;
 
 extern const char *TITLE;
 extern int VERSION, DEF_WIDTH, DEF_HEIGHT, WIDTH, HEIGHT, SCALE;
+extern float SPRITE_WIDTH, SPRITE_HEIGHT;
 struct Image
 {
     string source;

@@ -5,6 +5,7 @@
 #include "../sprites/gate.h"
 #include "../tools/text.h"
 #include "../tools/map.h"
+#include "../ui/button.h"
 
 class Game
 {
@@ -12,27 +13,40 @@ public:
     SDL_Renderer *renderer = nullptr;
     SDL_Window *window = nullptr;
     SDL_Event event;
-    bool active;
-    Player *player;
-    double deltaTime;
-    Uint64 LAST = SDL_GetPerformanceCounter();
     Uint64 NOW;
-    vector<Carrot *> carrots;
-    vector<Spike *> spikes;
-    vector<Map *> maps;
-    Text *pointsText = nullptr;
-    Gate *gate;
-    Map *currentMap;
+    Uint64 LAST = SDL_GetPerformanceCounter();
     int level = 0;
+    double deltaTime;
+    bool active;
     Game();
     void launch();
     void render();
     void handle();
     void terminate();
-    void loadMaps();
-    void manageGroups();
-    void clear();
-    void updateMap();
     double calcDeltaTime();
     ~Game();
+
+private:
+    Player *player = nullptr;
+    Gate *gate = nullptr;
+    Text *pointsText = nullptr;
+    Map *currentMap = nullptr;
+    vector<Grass *> grasses;
+    vector<Carrot *> carrots;
+    vector<Spike *> spikes;
+    vector<Map *> maps;
+    struct UIElements
+    {
+        vector<Button *> buttons;
+    } UI;
+    void clear();
+    void loadMaps();
+    void manageObjects();
+    void updateMap();
+    void handleCollision();
+    template <typename T>
+    void generatePlatform(
+        Map::Object obj,
+        function<T *(SDL_Renderer *, float, float)> createSprite,
+        vector<T *> &sprites);
 };
