@@ -20,6 +20,13 @@ using namespace tinyxml2;
 extern const char *TITLE;
 extern int VERSION, DEF_WIDTH, DEF_HEIGHT, WIDTH, HEIGHT, SCALE;
 extern float SPRITE_WIDTH, SPRITE_HEIGHT;
+enum States
+{
+    home,
+    playing,
+    paused,
+    over
+};
 struct Image
 {
     string source;

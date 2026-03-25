@@ -15,6 +15,7 @@ public:
     SDL_Event event;
     Uint64 NOW;
     Uint64 LAST = SDL_GetPerformanceCounter();
+    States state = States::home;
     int level = 0;
     double deltaTime;
     bool active;
@@ -22,6 +23,7 @@ public:
     void launch();
     void render();
     void handle();
+    void update(States newState);
     void terminate();
     double calcDeltaTime();
     ~Game();
@@ -38,7 +40,7 @@ private:
     struct UIElements
     {
         vector<Button *> buttons;
-    } UI;
+    } ui;
     void clear();
     void loadMaps();
     void manageObjects();

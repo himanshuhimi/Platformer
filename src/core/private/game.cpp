@@ -19,6 +19,21 @@ Game::Game()
         renderer, std::to_string(player->points),
         WIDTH / 8, HEIGHT / 8,
         SDL_Color{0, 0, 0, 255});
+    vector<string> labels = {"PLAY", "QUIT"};
+    std::unordered_map<string, function<void()>> functions = {
+        {"PLAY", [this]
+         { update(States::playing); }}
+    };
+    for (int i = 0; i < labels.size(); i++)
+    {
+        string label = labels[i];
+        float x = WIDTH / 2;
+        float y = HEIGHT / 2 + (i * 60);
+        ui.buttons.emplace_back(new Button(
+            renderer, x, y,
+            functions[label],
+            label, SDL_Color{255, 255, 255, 255}));
+    }
     active = true;
 }
 
@@ -33,19 +48,30 @@ void Game::launch()
 
 void Game::render()
 {
-    SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    currentMap->render();
-    if (gate != nullptr)
-        gate->render();
-    if (!carrots.empty())
-        for (Carrot *carrot : carrots)
-            if (!carrot->taken)
-                carrot->render();
-    if (player != nullptr)
-        player->render();
-    if (pointsText != nullptr)
-        pointsText->render();
+    switch (state)
+    {
+    case States::home:
+        for (auto button : ui.buttons)
+            button->render();
+        break;
+    case States::playing:
+        SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
+        SDL_RenderClear(renderer);
+        currentMap->render();
+        if (gate != nullptr)
+            gate->render();
+        if (!carrots.empty())
+            for (Carrot *carrot : carrots)
+                if (!carrot->taken)
+                    carrot->render();
+        if (player != nullptr)
+            player->render();
+        if (pointsText != nullptr)
+            pointsText->render();
+        break;
+    }
     SDL_RenderPresent(renderer);
 }
 
@@ -53,17 +79,32 @@ void Game::handle()
 {
     deltaTime = calcDeltaTime();
     while (SDL_PollEvent(&event))
+    {
         if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
             terminate();
-    if (!carrots.empty())
-        for (Carrot *carrot : carrots)
-            if (!carrot->taken)
-                carrot->handle(deltaTime);
-    if (player != nullptr)
-        player->handle(deltaTime, grasses);
-    handleCollision();
-    if (pointsText != nullptr)
-        pointsText->update(std::to_string(player->points));
+        if (state == States::home)
+            for (auto button : ui.buttons)
+                button->handle(deltaTime, event);
+    }
+    switch (state)
+    {
+    case States::playing:
+        if (!carrots.empty())
+            for (Carrot *carrot : carrots)
+                if (!carrot->taken)
+                    carrot->handle(deltaTime);
+        if (player != nullptr)
+            player->handle(deltaTime, grasses);
+        handleCollision();
+        if (pointsText != nullptr)
+            pointsText->update(std::to_string(player->points));
+        break;
+    }
+}
+
+void Game::update(States newState)
+{
+    state = newState;
 }
 
 void Game::terminate()

@@ -42,7 +42,6 @@ void Player::handle(double deltaTime, const vector<Grass *> &grasses)
     points = carrotsEarned.size();
     if (rect.y >= HEIGHT)
         respawn();
-    log(std::to_string(Vector.x));
 }
 
 void Player::render()
