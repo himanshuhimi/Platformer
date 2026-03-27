@@ -33,6 +33,7 @@ private:
     Gate *gate = nullptr;
     Text *pointsText = nullptr;
     Map *currentMap = nullptr;
+    Carrot *displayCarrot;
     vector<Grass *> grasses;
     vector<Carrot *> carrots;
     vector<Spike *> spikes;

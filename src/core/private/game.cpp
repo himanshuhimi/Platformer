@@ -18,18 +18,15 @@ Game::Game()
     pointsText = new Text(
         renderer, std::to_string(player->points),
         WIDTH / 8, HEIGHT / 8,
-        SDL_Color{0, 0, 0, 255});
+        WHITE);
     vector<string> labels = {"PLAY", "QUIT"};
     std::unordered_map<string, function<void()>> functions = {
-        {
-            "PLAY", 
-            [this]{ update(States::playing); }
-        },
-        {
-            "QUIT",
-            [this]{ terminate(); }
-        }
-    };
+        {"PLAY",
+         [this]
+         { update(States::playing); }},
+        {"QUIT",
+         [this]
+         { terminate(); }}};
     for (int i = 0; i < labels.size(); i++)
     {
         string label = labels[i];
@@ -38,8 +35,12 @@ Game::Game()
         ui.buttons.emplace_back(new Button(
             renderer, x, y,
             functions[label],
-            label, SDL_Color{255, 255, 255, 255}));
+            label, WHITE));
     }
+    displayCarrot = new Carrot(
+        renderer,
+        pointsText->rect.w * 2,
+        pointsText->rect.y + pointsText->rect.h);
     active = true;
 }
 
@@ -66,6 +67,18 @@ void Game::render()
         SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
         SDL_RenderClear(renderer);
         currentMap->render();
+        if (pointsText != nullptr)
+        {
+            RenderRectangle(
+                renderer, GREY,
+                pointsText->rect.w * 6,
+                pointsText->rect.h,
+                pointsText->rect.x - pointsText->rect.w / 2,
+                pointsText->rect.y,
+                8);
+            pointsText->render();
+            displayCarrot->render();
+        }
         if (gate != nullptr)
             gate->render();
         if (!carrots.empty())
@@ -74,8 +87,6 @@ void Game::render()
                     carrot->render();
         if (player != nullptr)
             player->render();
-        if (pointsText != nullptr)
-            pointsText->render();
         break;
     }
     SDL_RenderPresent(renderer);
@@ -153,7 +164,9 @@ void Game::handleCollision()
     }
     if (gate != nullptr)
     {
-        if (SDL_HasRectIntersectionFloat(&player->rect, &gate->rect))
+        if (
+            SDL_HasRectIntersectionFloat(&player->rect, &gate->rect) &&
+            player->points >= carrots.size())
         {
             level += 1;
             clear();
@@ -161,7 +174,7 @@ void Game::handleCollision()
             pointsText = new Text(
                 renderer, std::to_string(player->points),
                 WIDTH / 8, HEIGHT / 8,
-                SDL_Color{0, 0, 0, 255});
+                WHITE);
         }
     }
 }

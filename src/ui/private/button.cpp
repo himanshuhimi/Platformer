@@ -8,6 +8,7 @@ Button::Button(
     SDL_Color color) : renderer(renderer), Position(x, y), func(func)
 {
     text = new Text(renderer, label, Position.x, Position.y, color);
+    Position.x += text->rect.w / 2;
 };
 
 bool Button::hovered(SDL_Event event)

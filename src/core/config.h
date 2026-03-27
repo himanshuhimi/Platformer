@@ -20,6 +20,9 @@ using namespace tinyxml2;
 extern const char *TITLE;
 extern int VERSION, DEF_WIDTH, DEF_HEIGHT, WIDTH, HEIGHT, SCALE;
 extern float SPRITE_WIDTH, SPRITE_HEIGHT;
+extern SDL_Color WHITE;
+extern SDL_Color GREY;
+extern SDL_Color BLACK;
 enum States
 {
     home,
@@ -48,10 +51,12 @@ struct Cooldown
 };
 void log(string message);
 SDL_Texture *createTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface);
+void DrawFilledCircle(SDL_Renderer *renderer, int cx, int cy, int radius);
 void RenderRectangle(
     SDL_Renderer *renderer,
     SDL_Color color,
     float width,
     float height,
     float x,
-    float y);
+    float y,
+    float borderRadius = 0);

@@ -6,9 +6,8 @@ Text::Text(
     float x,
     float y,
     SDL_Color color,
-    string fontSource,
-    int pixelSize
-) : renderer(renderer), x(x), y(y), color(color), pixelSize(pixelSize)
+    int pixelSize,
+    string fontSource) : renderer(renderer), x(x), y(y), pixelSize(pixelSize), color(color)
 {
     pixelSize *= SCALE;
     font = TTF_OpenFont(fontSource.c_str(), pixelSize);

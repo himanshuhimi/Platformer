@@ -16,8 +16,7 @@ public:
         float x, float y,
         std::function<void()> func,
         string label,
-        SDL_Color color
-    );
+        SDL_Color color);
     bool hovered(SDL_Event event);
     bool clicked(SDL_Event event);
     void handle(double deltaTime, SDL_Event event);
