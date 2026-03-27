@@ -16,6 +16,7 @@
 
 using std::string, std::vector, std::function, std::unique_ptr, std::make_unique;
 using namespace tinyxml2;
+namespace fs = std::filesystem;
 
 extern const char *TITLE;
 extern int VERSION, DEF_WIDTH, DEF_HEIGHT, WIDTH, HEIGHT, SCALE;
@@ -27,6 +28,7 @@ enum States
 {
     home,
     playing,
+    progression,
     paused,
     over
 };

@@ -21,7 +21,7 @@ Text::Text(
     textTexture = createTextureFromSurface(renderer, textSurface);
     SDL_DestroySurface(textSurface);
     SDL_GetTextureSize(textTexture, &rect.w, &rect.h);
-    rect.x = x - rect.w;
+    rect.x = x - rect.w / 2;
     rect.y = y;
 }
 

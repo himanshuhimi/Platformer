@@ -4,18 +4,12 @@ Game::Game()
 {
     if (!SDL_Init(SDL_INIT_VIDEO))
         log("SDL Uninitialized: " + (string)SDL_GetError());
-    else
-        log("SDL Initiliazed");
     if (!TTF_Init())
         log("TTF Uninitialized: " + (string)SDL_GetError());
-    else
-        log("TTF Initialized");
     if (!SDL_CreateWindowAndRenderer(TITLE, WIDTH, HEIGHT, 0, &window, &renderer))
         log("Display Uninitialized: " + (string)SDL_GetError());
-    else
-        log("Display Initialized");
-    loadMaps();
-    pointsText = new Text(
+    fetchMaps();
+    points = new Text(
         renderer, std::to_string(player->points),
         WIDTH / 8, HEIGHT / 8,
         WHITE);
@@ -32,24 +26,42 @@ Game::Game()
         string label = labels[i];
         float x = WIDTH / 2;
         float y = HEIGHT / 2 + (i * 60);
-        ui.buttons.emplace_back(new Button(
+        buttons.emplace_back(new Button(
             renderer, x, y,
             functions[label],
             label, WHITE));
     }
     displayCarrot = new Carrot(
         renderer,
-        pointsText->rect.w * 2,
-        pointsText->rect.y + pointsText->rect.h);
+        points->rect.w * 2,
+        points->rect.y + points->rect.h);
     active = true;
 }
 
-void Game::launch()
+void Game::handle()
 {
-    while (active)
+    deltaTime = updateDeltaTime();
+    while (SDL_PollEvent(&event))
     {
-        handle();
-        render();
+        if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
+            terminate();
+        if (state == States::home)
+            for (auto button : buttons)
+                button->handle(deltaTime, event);
+    }
+    switch (state)
+    {
+    case States::playing:
+        if (!carrots.empty())
+            for (Carrot *carrot : carrots)
+                if (!carrot->taken)
+                    carrot->handle(deltaTime);
+        if (player != nullptr)
+            player->handle(deltaTime, grasses);
+        handleCollision();
+        if (points != nullptr)
+            points->update(std::to_string(player->points));
+        break;
     }
 }
 
@@ -60,23 +72,23 @@ void Game::render()
     switch (state)
     {
     case States::home:
-        for (auto button : ui.buttons)
+        for (auto button : buttons)
             button->render();
         break;
     case States::playing:
         SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
         SDL_RenderClear(renderer);
         currentMap->render();
-        if (pointsText != nullptr)
+        if (points != nullptr)
         {
             RenderRectangle(
                 renderer, GREY,
-                pointsText->rect.w * 6,
-                pointsText->rect.h,
-                pointsText->rect.x - pointsText->rect.w / 2,
-                pointsText->rect.y,
+                points->rect.w * 6,
+                points->rect.h,
+                points->rect.x - points->rect.w / 2,
+                points->rect.y,
                 8);
-            pointsText->render();
+            points->render();
             displayCarrot->render();
         }
         if (gate != nullptr)
@@ -92,36 +104,13 @@ void Game::render()
     SDL_RenderPresent(renderer);
 }
 
-void Game::handle()
+void Game::launch()
 {
-    deltaTime = calcDeltaTime();
-    while (SDL_PollEvent(&event))
+    while (active)
     {
-        if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
-            terminate();
-        if (state == States::home)
-            for (auto button : ui.buttons)
-                button->handle(deltaTime, event);
+        handle();
+        render();
     }
-    switch (state)
-    {
-    case States::playing:
-        if (!carrots.empty())
-            for (Carrot *carrot : carrots)
-                if (!carrot->taken)
-                    carrot->handle(deltaTime);
-        if (player != nullptr)
-            player->handle(deltaTime, grasses);
-        handleCollision();
-        if (pointsText != nullptr)
-            pointsText->update(std::to_string(player->points));
-        break;
-    }
-}
-
-void Game::update(States newState)
-{
-    state = newState;
 }
 
 void Game::terminate()
@@ -129,12 +118,17 @@ void Game::terminate()
     active = false;
 }
 
-double Game::calcDeltaTime()
+double Game::updateDeltaTime()
 {
     NOW = SDL_GetPerformanceCounter();
     double dt = (double)(NOW - LAST) / SDL_GetPerformanceFrequency();
     LAST = NOW;
     return dt;
+}
+
+void Game::update(States newState)
+{
+    state = newState;
 }
 
 void Game::handleCollision()
@@ -171,76 +165,13 @@ void Game::handleCollision()
             level += 1;
             clear();
             updateMap();
-            pointsText = new Text(
+            points = new Text(
                 renderer, std::to_string(player->points),
                 WIDTH / 8, HEIGHT / 8,
                 WHITE);
         }
     }
 }
-
-void Game::loadMaps()
-{
-    for (Map *map : maps)
-        delete map;
-    maps.clear();
-    string mapPath = "maps";
-    for (const auto &entry : std::filesystem::directory_iterator(mapPath))
-    {
-        string path = entry.path().string();
-        std::filesystem::path p(path);
-        string filename = p.stem().string();
-        bool isDigit = !filename.empty() && std::all_of(
-                                                filename.begin(),
-                                                filename.end(),
-                                                [](unsigned char c)
-                                                { return std::isdigit(c); });
-        if (isDigit)
-            maps.emplace_back(new Map(renderer, path));
-    }
-    updateMap();
-}
-
-void Game::manageObjects()
-{
-    for (Map::Object obj : currentMap->objectGroup.objects)
-    {
-        string name = obj.name;
-        if (name == "player")
-            player = new Player(renderer, obj.x, obj.y - SPRITE_HEIGHT);
-        else if (name == "gate")
-            gate = new Gate(renderer, obj.x, obj.y - SPRITE_HEIGHT);
-        else if (name == "carrot")
-            carrots.push_back(new Carrot(renderer, obj.x, obj.y - SPRITE_HEIGHT));
-        else if (name == "grasses")
-        {
-            auto createSprite = [](SDL_Renderer *r, float x, float y)
-            {
-                return new Grass(r, x, y);
-            };
-            generatePlatform<Grass>(obj, createSprite, grasses);
-        }
-        else if (name == "spikes")
-        {
-            auto createSprite = [](SDL_Renderer *r, float x, float y)
-            {
-                return new Spike(r, x, y);
-            };
-            generatePlatform<Spike>(obj, createSprite, spikes);
-        }
-    }
-}
-
-template <typename T>
-void Game::generatePlatform(
-    Map::Object obj,
-    function<T *(SDL_Renderer *, float, float)> createSprite,
-    vector<T *> &sprites)
-{
-    int n = obj.width / SPRITE_WIDTH;
-    for (int i = 0; i < n; i++)
-        sprites.push_back(createSprite(renderer, obj.x + (i * SPRITE_WIDTH), obj.y));
-};
 
 void Game::clear()
 {
@@ -273,10 +204,62 @@ void Game::clear()
         delete gate;
         gate = nullptr;
     }
-    if (pointsText != nullptr)
+    if (points != nullptr)
     {
-        delete pointsText;
-        pointsText = nullptr;
+        delete points;
+        points = nullptr;
+    }
+}
+
+void Game::fetchMaps()
+{
+    for (Map *map : maps)
+        delete map;
+    maps.clear();
+    string mapPath = "maps";
+    for (const auto &entry : std::filesystem::directory_iterator(mapPath))
+    {
+        string path = entry.path().string();
+        std::filesystem::path p(path);
+        string filename = p.stem().string();
+        bool isDigit = !filename.empty() && std::all_of(
+                                                filename.begin(),
+                                                filename.end(),
+                                                [](unsigned char c)
+                                                { return std::isdigit(c); });
+        if (isDigit)
+            maps.emplace_back(new Map(renderer, path));
+    }
+    updateMap();
+}
+
+void Game::updateObjects()
+{
+    for (Map::Object obj : currentMap->objectGroup.objects)
+    {
+        string name = obj.name;
+        if (name == "player")
+            player = new Player(renderer, obj.x, obj.y - SPRITE_HEIGHT);
+        else if (name == "gate")
+            gate = new Gate(renderer, obj.x, obj.y - SPRITE_HEIGHT);
+        else if (name == "carrot")
+            carrots.push_back(new Carrot(renderer, obj.x, obj.y - SPRITE_HEIGHT));
+        else if (name == "grasses")
+        {
+            auto createSprite = [](SDL_Renderer *r, float x, float y)
+            {
+                return new Grass(r, x, y);
+            };
+            createPlatform<Grass>(obj, createSprite, grasses);
+        }
+        else if (name == "spikes")
+        {
+            auto createSprite = [](SDL_Renderer *r, float x, float y)
+            {
+                return new Spike(r, x, y);
+            };
+            createPlatform<Spike>(obj, createSprite, spikes);
+        }
     }
 }
 
@@ -290,11 +273,22 @@ void Game::updateMap()
         if (p.stem().string() == std::to_string(level))
         {
             currentMap = map;
-            manageObjects();
+            updateObjects();
             break;
         }
     }
 }
+
+template <typename T>
+void Game::createPlatform(
+    Map::Object obj,
+    function<T *(SDL_Renderer *, float, float)> createSprite,
+    vector<T *> &sprites)
+{
+    int n = obj.width / SPRITE_WIDTH;
+    for (int i = 0; i < n; i++)
+        sprites.push_back(createSprite(renderer, obj.x + (i * SPRITE_WIDTH), obj.y));
+};
 
 Game::~Game()
 {

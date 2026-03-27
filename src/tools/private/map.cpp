@@ -5,8 +5,6 @@ Map::Map(SDL_Renderer *renderer, string source)
 {
     if (doc.LoadFile(source.c_str()) != XML_SUCCESS)
         log("Map Uninitialized: " + source);
-    else
-        log("Map Initialized: " + source);
     mapElement = doc.FirstChildElement("map");
     width = mapElement->IntAttribute("width");
     height = mapElement->IntAttribute("height");
