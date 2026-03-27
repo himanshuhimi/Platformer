@@ -21,8 +21,14 @@ Game::Game()
         SDL_Color{0, 0, 0, 255});
     vector<string> labels = {"PLAY", "QUIT"};
     std::unordered_map<string, function<void()>> functions = {
-        {"PLAY", [this]
-         { update(States::playing); }}
+        {
+            "PLAY", 
+            [this]{ update(States::playing); }
+        },
+        {
+            "QUIT",
+            [this]{ terminate(); }
+        }
     };
     for (int i = 0; i < labels.size(); i++)
     {
