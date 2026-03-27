@@ -28,7 +28,6 @@ enum States
 {
     home,
     playing,
-    progression,
     paused,
     over
 };
@@ -62,3 +61,4 @@ void RenderRectangle(
     float x,
     float y,
     float borderRadius = 0);
+bool isDigit(string data);
