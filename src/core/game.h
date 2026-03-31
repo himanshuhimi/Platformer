@@ -1,10 +1,7 @@
 #pragma once
 
 #include "config.h"
-#include "../sprites/player.h"
-#include "../sprites/gate.h"
-#include "../tools/text.h"
-#include "../tools/map.h"
+#include "../tools/level.h"
 #include "../ui/button.h"
 
 class Game 
@@ -12,8 +9,14 @@ class Game
 public:
     SDL_Renderer *renderer = nullptr;
     SDL_Window *window = nullptr;
-    States state = States::home;
+    States state = States::playing;
     SDL_Event event;
+    Player *player = nullptr;
+    Gate *gate = nullptr;
+    Carrot *displayCarrot = nullptr;
+    vector<Grass *> grasses;
+    vector<Carrot *> carrots;
+    vector<Spike *> spikes;
     bool active = false;
     double deltaTime = 0.0;
     int level = 0;
@@ -27,27 +30,14 @@ public:
     ~Game();
 
 private:
-    Player *player = nullptr;
-    Gate *gate = nullptr;
-    Carrot *displayCarrot = nullptr;
-    vector<Grass *> grasses;
-    vector<Carrot *> carrots;
-    vector<Spike *> spikes;
     vector<Button *> buttons;
-    vector<Map *> maps;
+    Level *currentLevel = nullptr;
+    unordered_map<int, Level *> levels;
     Text *points = nullptr;
-    Map *currentMap = nullptr;
     Uint64 LAST = SDL_GetPerformanceCounter();
     Uint64 NOW;
+    void loadLevels();
     void clear();
-    void fetchMaps();
-    void updateObjects();
-    void updateMap();
     void handleCollision();
-    template <typename T>
-    void createPlatform(
-        Map::Object obj,
-        function<T *(SDL_Renderer *, float, float)> createSprite,
-        vector<T *> &sprites
-    );
+    void updateLevel();
 };

@@ -14,7 +14,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <tinyxml2.h>
 
-using std::string, std::vector, std::function, std::unique_ptr, std::make_unique;
+using std::string, std::vector, std::function, std::unordered_map;
 using namespace tinyxml2;
 namespace fs = std::filesystem;
 
@@ -28,6 +28,7 @@ enum States
 {
     home,
     playing,
+    completion,
     paused,
     over
 };
@@ -53,7 +54,7 @@ struct Cooldown
 void log(string message);
 SDL_Texture *createTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface);
 void DrawFilledCircle(SDL_Renderer *renderer, int cx, int cy, int radius);
-void RenderRectangle(
+SDL_FRect RenderRectangle(
     SDL_Renderer *renderer,
     SDL_Color color,
     float width,
@@ -61,4 +62,3 @@ void RenderRectangle(
     float x,
     float y,
     float borderRadius = 0);
-bool isDigit(string data);

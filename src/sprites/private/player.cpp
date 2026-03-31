@@ -10,6 +10,8 @@ Player::Player(SDL_Renderer *renderer, float x, float y)
 
 void Player::handle(double deltaTime, const vector<Grass *> &grasses)
 {
+    if (!movable)
+        return;
     const bool *keys = SDL_GetKeyboardState(NULL);
     Vector.x = -((int)keys[SDL_SCANCODE_A] - (int)keys[SDL_SCANCODE_D]) * speed;
     Sprite::handle(deltaTime);

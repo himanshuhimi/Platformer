@@ -43,7 +43,7 @@ void DrawFilledCircle(SDL_Renderer *renderer, int cx, int cy, int radius)
             if (dx * dx + dy * dy <= radius * radius)
                 SDL_RenderPoint(renderer, cx + dx, cy + dy);
 }
-void RenderRectangle(
+SDL_FRect RenderRectangle(
     SDL_Renderer *renderer,
     SDL_Color color,
     float width,
@@ -99,4 +99,5 @@ void RenderRectangle(
                      x + width / 2 - borderRadius,
                      y + height - borderRadius,
                      borderRadius);
+    return center;
 }

@@ -9,9 +9,9 @@
 class Player : public Sprite
 {
 public:
-    int points = 0, level = 0, health = 100;
+    int points = 0, health = 100;
     float jumpForce, gravity;
-    bool onGround, spacePressed;
+    bool movable = true, onGround, spacePressed, win;
     vector<Grass *> collidedGrasses;
     vector<Carrot *> carrotsEarned;
     Cooldown jumpCooldown = {0.5f};
