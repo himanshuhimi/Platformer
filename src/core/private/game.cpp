@@ -8,6 +8,7 @@ Game::Game()
         log("TTF Uninitialized: " + (string)SDL_GetError());
     if (!SDL_CreateWindowAndRenderer(TITLE, WIDTH, HEIGHT, 0, &window, &renderer))
         log("Display Uninitialized: " + (string)SDL_GetError());
+    ui = new UIElements(this);
     loadLevels();
     active = true;
 }
@@ -19,6 +20,7 @@ void Game::handle()
     {
         if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
             terminate();
+        ui->handle(event);
     }
     switch (state)
     {
@@ -38,6 +40,7 @@ void Game::render()
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
+    ui->render();
     switch (state)
     {
     case States::playing:
@@ -83,6 +86,7 @@ double Game::updateDeltaTime()
 void Game::update(States newState)
 {
     state = newState;
+    ui->loadButtons();
 }
 
 void Game::handleCollision()
@@ -170,7 +174,7 @@ void Game::clear()
     }
 }
 
-void Game::updateLevel() 
+void Game::updateLevel()
 {
     auto it = levels.find(level);
     if (it == levels.end())
@@ -181,6 +185,72 @@ void Game::updateLevel()
     }
     currentLevel = it->second;
     currentLevel->updateSprites(this);
+}
+
+template <typename T>
+Game::UIElements<T>::UIElements(T game)
+    : game(game)
+{
+    loadButtons();
+}
+
+template <typename T>
+void Game::UIElements<T>::loadButtons()
+{
+    vector<string> labels = getButtonLabels();
+    unordered_map<string, function<void()>> functions = getButtonFunctions();
+    for (int i = 0; i < labels.size(); i++)
+    {
+        string label = labels[i];
+        Button *button = new Button(
+            game->renderer, WIDTH / 2, HEIGHT / 2 + (i * 60),
+            functions[label], label, WHITE);
+        buttons.emplace_back(button);
+    }
+}
+
+template <typename T>
+vector<string> Game::UIElements<T>::getButtonLabels()
+{
+    vector<string> res;
+    switch (game->state)
+    {
+    case States::home:
+        res = {"PLAY", "QUIT"};
+        break;
+    case States::completion:
+        res = {"HOME"};
+        break;
+    }
+    return res;
+}
+
+template <typename T>
+unordered_map<string, function<void()>> Game::UIElements<T>::getButtonFunctions()
+{
+    return {
+        {"PLAY", [this]()
+         { game->update(States::playing); }},
+        {"QUIT", [this]()
+         { game->terminate(); }},
+        {"HOME", [this]()
+         { game->update(States::home); }}};
+}
+
+template <typename T>
+void Game::UIElements<T>::render()
+{
+    for (Button *button : buttons)
+        if (button != nullptr)
+            button->render();
+}
+
+template <typename T>
+void Game::UIElements<T>::handle(SDL_Event event)
+{
+    for (Button *button : buttons)
+        if (button != nullptr)
+            button->handle(game->deltaTime, event);
 }
 
 Game::~Game()
