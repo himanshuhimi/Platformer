@@ -41,7 +41,6 @@ void Player::handle(double deltaTime, const vector<Grass *> &grasses)
         Vector.y += gravity * deltaTime;
     jumpCooldown.timeElapsed += deltaTime;
     jumpCooldown.available = jumpCooldown.timeElapsed >= jumpCooldown.duration;
-    points = carrotsEarned.size();
     if (rect.y >= HEIGHT)
         respawn();
 }
@@ -49,8 +48,6 @@ void Player::handle(double deltaTime, const vector<Grass *> &grasses)
 void Player::render()
 {
     Sprite::render();
-    for (Carrot *carrot : carrotsEarned)
-        carrot->render();
 }
 
 void Player::respawn()

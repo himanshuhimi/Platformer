@@ -53,7 +53,7 @@
   <object id="1" name="player" x="32" y="32">
    <point/>
   </object>
-  <object id="2" name="gate" x="608" y="32">
+  <object id="2" name="gate" x="592.75" y="31.875">
    <point/>
   </object>
   <object id="3" name="carrot" x="160" y="128">

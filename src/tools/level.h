@@ -18,15 +18,36 @@ public:
     void updateSprites(T *game)
     {
         game->clear();
+        int textSize = 16;
         for (Map::Object obj : map->objectGroup.objects)
         {
             string name = obj.name;
             if (name == "player")
                 game->player = new Player(renderer, obj.x, obj.y - SPRITE_HEIGHT);
             else if (name == "gate")
+            {
                 game->gate = new Gate(renderer, obj.x, obj.y - SPRITE_HEIGHT);
+                game->displayCarrot = new Carrot(
+                    renderer, 
+                    obj.x,
+                    obj.y - SPRITE_HEIGHT - 4, 0.5
+                );
+                game->displayCarrot->rect.x += game->displayCarrot->rect.w / 2;
+                game->pointsText = new Text(
+                    renderer, "0",
+                    obj.x, obj.y - SPRITE_HEIGHT * 1.7,
+                    WHITE, textSize
+                );
+                game->carrotsText = new Text(
+                    renderer, "0",
+                    obj.x, obj.y - SPRITE_HEIGHT * 1.7,
+                    WHITE, textSize
+                );
+                game->carrotsText->rect.x += game->displayCarrot->rect.w * 2;
+            }
             else if (name == "carrot")
-                game->carrots.push_back(new Carrot(renderer, obj.x, obj.y - SPRITE_HEIGHT));
+                game->carrots.push_back(new Carrot(
+                    renderer, obj.x, obj.y - SPRITE_HEIGHT));
             else if (name == "grasses")
             {
                 auto createGrass = [](SDL_Renderer *r, float x, float y)

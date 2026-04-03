@@ -10,6 +10,12 @@ Game::Game()
         log("Display Uninitialized: " + (string)SDL_GetError());
     ui = new UIElements(this);
     SDL_AddTimer(3000, cloudTimerCallback, this);
+    levelUpText = new Text(
+        renderer, "LEVEL UP!",
+        WIDTH / 2, HEIGHT / 2,
+        WHITE,
+        60
+    );
     active = true;
 }
 
@@ -57,13 +63,48 @@ void Game::render()
         if (currentLevel != nullptr)
             currentLevel->render();
         if (gate != nullptr)
+        {
             gate->render();
+            displayRect = RenderRectangle(
+                renderer, BLACK,
+                SPRITE_WIDTH * 2, SPRITE_HEIGHT / 2,
+                SPRITE_WIDTH / 2 + gate->Position.x,
+                gate->Position.y - SPRITE_HEIGHT / 2 - 4,
+                6
+            );
+        }
         if (!carrots.empty())
             for (Carrot *carrot : carrots)
                 if (!carrot->taken)
                     carrot->render();
+        if (displayCarrot != nullptr)
+            displayCarrot->render();
         if (player != nullptr)
             player->render();
+        if (pointsText != nullptr)
+            pointsText->render();
+        if (carrotsText != nullptr)
+            carrotsText->render();
+        if (SDL_HasRectIntersectionFloat(&player->rect, &gate->rect) &&
+            player->points >= totalCarrots && !intermissionComplete)
+        {
+            intermissionRadius++;
+            if (intermissionRadius > HEIGHT)
+            {
+                intermissionComplete = true;
+                intermissionRadius = 0;
+            }
+            DrawFilledCircle(renderer, 
+                (int)WIDTH / 2, (int)HEIGHT / 2, 
+                intermissionRadius
+            );
+            if (levelUpText != nullptr)
+            {
+                levelUpTextAlpha++;
+                levelUpText->render();
+                levelUpText->updateAlpha(levelUpTextAlpha);
+            }
+        }
     }
     ui->render();
     SDL_RenderPresent(renderer);
@@ -99,17 +140,15 @@ void Game::update(States newState)
 
 void Game::handleCollision()
 {
-    for (auto it = carrots.begin(); it != carrots.end();)
+    for (Carrot *carrot : carrots)
     {
-        Carrot *carrot = *it;
-        if (SDL_HasRectIntersectionFloat(&player->rect, &carrot->rect))
+        if (SDL_HasRectIntersectionFloat(&player->rect, &carrot->rect) && !carrot->taken)
         {
-            player->carrotsEarned.push_back(carrot);
             carrot->taken = true;
-            it = carrots.erase(it);
+            player->points++;
+            if (pointsText != nullptr)
+                pointsText->updateData(std::to_string(player->points));
         }
-        else
-            ++it;
     }
     for (auto spikeIT = spikes.begin(); spikeIT != spikes.end();)
     {
@@ -123,16 +162,17 @@ void Game::handleCollision()
             ++spikeIT;
     }
     if (gate != nullptr)
-    {
-        if (
-            SDL_HasRectIntersectionFloat(&player->rect, &gate->rect) &&
-            player->points >= carrots.size())
+        if (SDL_HasRectIntersectionFloat(&player->rect, &gate->rect) &&
+            player->points >= totalCarrots)
         {
-            level += 1;
-            clear();
-            updateLevel();
+            player->movable = false;
+            if (intermissionComplete)
+            {
+                level++;
+                clear();
+                updateLevel();
+            }
         }
-    }
 }
 
 void Game::loadLevels()
@@ -169,9 +209,14 @@ void Game::clear()
             delete grass;
         grasses.clear();
     }
+    if (!clouds.empty())
+    {
+        for (Cloud *cloud : clouds)
+            delete cloud;
+        clouds.clear();
+    }
     if (player != nullptr)
     {
-        player->carrotsEarned.clear();
         delete player;
         player = nullptr;
     }
@@ -193,7 +238,12 @@ void Game::updateLevel()
     }
     currentLevel = it->second;
     currentLevel->updateSprites(this);
-    player->carrotsEarned.clear();
+    totalCarrots = carrots.size();
+    if (carrotsText != nullptr)
+        carrotsText->updateData(std::to_string(totalCarrots));
+    intermissionComplete = false;
+    intermissionRadius = 0;
+    levelUpTextAlpha = 0;
 }
 
 template <typename T>

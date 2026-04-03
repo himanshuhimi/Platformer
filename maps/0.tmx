@@ -75,7 +75,7 @@
   <object id="49" name="carrot" x="480" y="224">
    <point/>
   </object>
-  <object id="50" name="gate" x="608" y="320">
+  <object id="50" name="gate" x="594.833" y="320">
    <point/>
   </object>
  </objectgroup>

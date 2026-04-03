@@ -2,6 +2,7 @@
 
 #include "../core/config.h"
 #include "../tools/sprite.h"
+#include "../tools/text.h"
 #include "grass.h"
 #include "carrot.h"
 #include "spike.h"
@@ -13,7 +14,6 @@ public:
     float jumpForce, gravity;
     bool movable = true, onGround, spacePressed, win;
     vector<Grass *> collidedGrasses;
-    vector<Carrot *> carrotsEarned;
     Cooldown jumpCooldown = {0.5f};
     Vector2D spawnPos;
     Player(SDL_Renderer *renderer, float x, float y);

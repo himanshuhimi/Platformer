@@ -11,7 +11,7 @@ public:
     SDL_Texture *textTexture = nullptr;
     SDL_FRect rect;
     SDL_Color color;
-    int pixelSize = 0, x = 0, y = 0;
+    int pixelSize = 0, x = 0, y = 0, alpha = 255;
     Text(
         SDL_Renderer *renderer,
         string data,
@@ -21,5 +21,6 @@ public:
         int pixelSize = 24,
         string fontSource = "assets/fonts/normal.ttf");
     void render();
-    void update(string newText);
+    void updateData(string newData);
+    void updateAlpha(int newAlpha);
 };

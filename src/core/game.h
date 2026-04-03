@@ -19,9 +19,11 @@ public:
     vector<Carrot *> carrots;
     vector<Spike *> spikes;
     vector<Cloud *> clouds;
+    SDL_FRect displayRect;
+    Text *pointsText = nullptr, *carrotsText = nullptr, *levelUpText = nullptr;
     bool active = false;
     double deltaTime = 0.0;
-    int level = 0;
+    int level = 0, totalCarrots = 0;
     Game();
     void handle();
     void render();
@@ -36,11 +38,11 @@ private:
     vector<Button *> buttons;
     Level *currentLevel = nullptr;
     unordered_map<int, Level *> levels;
-    Text *points = nullptr;
     Uint64 LAST = SDL_GetPerformanceCounter();
     Uint64 NOW;
     const Uint32 CLOUD_EVENT = SDL_RegisterEvents(1);
-    bool rectShifted = false;
+    bool rectShifted = false, intermissionComplete = false;
+    int intermissionRadius = 0, levelUpTextAlpha = 0;
     template <typename T>
     struct UIElements
     {

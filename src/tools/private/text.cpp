@@ -30,14 +30,21 @@ void Text::render()
     SDL_RenderTexture(renderer, textTexture, nullptr, &rect);
 }
 
-void Text::update(string newText)
+void Text::updateData(string newData)
 {
     if (textTexture)
         SDL_DestroyTexture(textTexture);
     textSurface = TTF_RenderText_Blended(
         font,
-        newText.c_str(),
-        newText.size(),
+        newData.c_str(),
+        newData.size(),
         color);
     textTexture = createTextureFromSurface(renderer, textSurface);
+}
+
+void Text::updateAlpha(int newAlpha)
+{
+    alpha = newAlpha;
+    if (textTexture)
+        SDL_SetTextureAlphaMod(textTexture, alpha);
 }
