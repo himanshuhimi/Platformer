@@ -17,6 +17,7 @@ public:
     template <typename T>
     void updateSprites(T *game)
     {
+        game->clear();
         for (Map::Object obj : map->objectGroup.objects)
         {
             string name = obj.name;

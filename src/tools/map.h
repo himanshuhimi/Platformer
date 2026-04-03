@@ -6,7 +6,7 @@ class Map
 {
 public:
     int width, height, tileWidth, tileHeight;
-    XMLDocument doc;
+    tinyxml2::XMLDocument doc;
     XMLElement *mapElement;
     string source;
     SDL_Renderer *renderer = nullptr;

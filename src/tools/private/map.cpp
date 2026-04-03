@@ -61,7 +61,7 @@ void Map::loadTileset(XMLElement *child)
         log("TSX Source Uninitialized");
         return;
     }
-    XMLDocument tsxDoc;
+    tinyxml2::XMLDocument tsxDoc;
     tsxDoc.LoadFile(tsxSource.c_str());
     XMLElement *tsxRoot = tsxDoc.FirstChildElement("tileset");
     if (!tsxRoot)

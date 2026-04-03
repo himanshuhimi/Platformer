@@ -101,3 +101,11 @@ SDL_FRect RenderRectangle(
                      borderRadius);
     return center;
 }
+int randint(int rangeBegin, int rangeEnd) {
+    static bool seeded = false;
+    if (!seeded) {
+        std::srand(static_cast<unsigned>(std::time(nullptr)));
+        seeded = true;
+    }
+    return rangeBegin + std::rand() % (rangeEnd - rangeBegin + 1);
+};

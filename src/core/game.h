@@ -2,9 +2,10 @@
 
 #include "config.h"
 #include "../tools/level.h"
+#include "../sprites/cloud.h"
 #include "../ui/button.h"
 
-class Game 
+class Game
 {
 public:
     SDL_Renderer *renderer = nullptr;
@@ -17,6 +18,7 @@ public:
     vector<Grass *> grasses;
     vector<Carrot *> carrots;
     vector<Spike *> spikes;
+    vector<Cloud *> clouds;
     bool active = false;
     double deltaTime = 0.0;
     int level = 0;
@@ -25,6 +27,7 @@ public:
     void render();
     void launch();
     void terminate();
+    void clear();
     double updateDeltaTime();
     void update(States newState);
     ~Game();
@@ -36,6 +39,8 @@ private:
     Text *points = nullptr;
     Uint64 LAST = SDL_GetPerformanceCounter();
     Uint64 NOW;
+    const Uint32 CLOUD_EVENT = SDL_RegisterEvents(1);
+    bool rectShifted = false;
     template <typename T>
     struct UIElements
     {
@@ -50,7 +55,7 @@ private:
     };
     UIElements<Game*>* ui;
     void loadLevels();
-    void clear();
     void handleCollision();
     void updateLevel();
+    static Uint32 cloudTimerCallback(void* userdata, SDL_TimerID id, Uint32 interval);
 };

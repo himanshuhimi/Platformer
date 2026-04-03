@@ -5,5 +5,6 @@
 class Cloud : public Sprite
 {
 public:
-    Cloud(SDL_Renderer *renderer, float x, float y);
+    Cloud(SDL_Renderer *renderer);
+    void handle(double deltaTime);
 };

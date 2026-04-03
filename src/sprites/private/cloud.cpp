@@ -1,7 +1,14 @@
 #include "../cloud.h"
 
-Cloud::Cloud(SDL_Renderer *renderer, float x, float y)
-    : Sprite(renderer, "cloud.png", x, y)
+Cloud::Cloud(SDL_Renderer *renderer)
+    : Sprite(renderer, "cloud.png", randint(20, WIDTH), randint(0, HEIGHT))
 {
-    Vector.x = -300;
+    Vector.x = -randint(20, 50);
+}
+
+void Cloud::handle(double deltaTime)
+{
+    if (Position.x <= -100)
+        return;
+    Sprite::handle(deltaTime);
 }

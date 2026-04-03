@@ -9,7 +9,7 @@ Game::Game()
     if (!SDL_CreateWindowAndRenderer(TITLE, WIDTH, HEIGHT, 0, &window, &renderer))
         log("Display Uninitialized: " + (string)SDL_GetError());
     ui = new UIElements(this);
-    loadLevels();
+    SDL_AddTimer(3000, cloudTimerCallback, this);
     active = true;
 }
 
@@ -20,11 +20,22 @@ void Game::handle()
     {
         if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
             terminate();
+        switch (event.type)
+        {
+        case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+            terminate();
+            break;
+        case SDL_EVENT_USER:
+            if (event.type == CLOUD_EVENT)
+                clouds.emplace_back(new Cloud(renderer));
+            break;
+        }
         ui->handle(event);
     }
-    switch (state)
+    for (Cloud *cloud : clouds)
+        cloud->handle(deltaTime);
+    if (state == States::playing)
     {
-    case States::playing:
         if (!carrots.empty())
             for (Carrot *carrot : carrots)
                 if (!carrot->taken)
@@ -32,20 +43,17 @@ void Game::handle()
         if (player != nullptr)
             player->handle(deltaTime, grasses);
         handleCollision();
-        break;
     }
 }
 
 void Game::render()
 {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
     SDL_RenderClear(renderer);
-    ui->render();
-    switch (state)
+    for (Cloud *cloud : clouds)
+        cloud->render();
+    if (state == States::playing)
     {
-    case States::playing:
-        SDL_SetRenderDrawColor(renderer, 100, 198, 243, 255);
-        SDL_RenderClear(renderer);
         if (currentLevel != nullptr)
             currentLevel->render();
         if (gate != nullptr)
@@ -56,8 +64,8 @@ void Game::render()
                     carrot->render();
         if (player != nullptr)
             player->render();
-        break;
     }
+    ui->render();
     SDL_RenderPresent(renderer);
 }
 
@@ -185,6 +193,7 @@ void Game::updateLevel()
     }
     currentLevel = it->second;
     currentLevel->updateSprites(this);
+    player->carrotsEarned.clear();
 }
 
 template <typename T>
@@ -197,6 +206,8 @@ Game::UIElements<T>::UIElements(T game)
 template <typename T>
 void Game::UIElements<T>::loadButtons()
 {
+    if (!buttons.empty())
+        buttons.clear();
     vector<string> labels = getButtonLabels();
     unordered_map<string, function<void()>> functions = getButtonFunctions();
     for (int i = 0; i < labels.size(); i++)
@@ -230,11 +241,17 @@ unordered_map<string, function<void()>> Game::UIElements<T>::getButtonFunctions(
 {
     return {
         {"PLAY", [this]()
-         { game->update(States::playing); }},
+         {
+             game->update(States::playing);
+             game->loadLevels();
+         }},
         {"QUIT", [this]()
          { game->terminate(); }},
         {"HOME", [this]()
-         { game->update(States::home); }}};
+         {
+             game->update(States::home);
+             game->level = 0;
+         }}};
 }
 
 template <typename T>
@@ -252,6 +269,16 @@ void Game::UIElements<T>::handle(SDL_Event event)
         if (button != nullptr)
             button->handle(game->deltaTime, event);
 }
+
+Uint32 Game::cloudTimerCallback(void *userdata, SDL_TimerID id, Uint32 interval)
+{
+    Game *game = static_cast<Game *>(userdata);
+    SDL_Event cloudEvent;
+    SDL_zero(cloudEvent);
+    cloudEvent.type = game->CLOUD_EVENT;
+    SDL_PushEvent(&cloudEvent);
+    return randint(0, 3000);
+};
 
 Game::~Game()
 {

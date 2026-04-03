@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cctype>
 #include <functional>
+#include <windows.h>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -62,3 +63,5 @@ SDL_FRect RenderRectangle(
     float x,
     float y,
     float borderRadius = 0);
+int randint(int rangeBegin, int rangeEnd);
+static Uint8 lerp(Uint8 a, Uint8 b, float t);

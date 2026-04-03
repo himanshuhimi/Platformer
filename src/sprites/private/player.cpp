@@ -49,7 +49,6 @@ void Player::handle(double deltaTime, const vector<Grass *> &grasses)
 void Player::render()
 {
     Sprite::render();
-    const bool *keys = SDL_GetKeyboardState(NULL);
     for (Carrot *carrot : carrotsEarned)
         carrot->render();
 }
