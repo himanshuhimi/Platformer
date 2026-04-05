@@ -22,7 +22,7 @@ file(GLOB_RECURSE PRIVATE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*/private/*.cpp
 )
 
-add_executable(${PROJECT_NAME} WIN32
+add_executable(${PROJECT_NAME}
     main.cpp
     ${PRIVATE_SOURCES}
 )

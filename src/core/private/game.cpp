@@ -155,7 +155,10 @@ void Game::handleCollision()
         Spike *spike = *spikeIT;
         if (SDL_HasRectIntersectionFloat(&player->rect, &spike->rect))
         {
-            player->respawn();
+            if (player->HP > 0)
+                player->damage();
+            else
+                player->kill();
             break;
         }
         else
@@ -165,7 +168,7 @@ void Game::handleCollision()
         if (SDL_HasRectIntersectionFloat(&player->rect, &gate->rect) &&
             player->points >= totalCarrots)
         {
-            player->movable = false;
+            player->state.movable = false;
             if (intermissionComplete)
             {
                 level++;

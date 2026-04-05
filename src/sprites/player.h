@@ -10,14 +10,20 @@
 class Player : public Sprite
 {
 public:
-    int points = 0, health = 100;
-    float jumpForce, gravity;
-    bool movable = true, onGround, spacePressed, win;
     vector<Grass *> collidedGrasses;
-    Cooldown jumpCooldown = {0.5f};
+    Cooldown jumpCooldown = {1.0f};
     Vector2D spawnPos;
+    int points = 0, HP = 3, dashMultiplier = 4;
+    float jumpForce, gravity;
+    bool spacePressed, win;
+    struct State
+    {
+        bool movable = false, jumping = false;
+    } state;
     Player(SDL_Renderer *renderer, float x, float y);
     void handle(double deltaTime, const vector<Grass *> &grasses);
     void render();
     void respawn();
+    void damage(int healthPoints = 1);
+    void kill();
 };
