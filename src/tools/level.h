@@ -3,6 +3,7 @@
 #include "../core/config.h"
 #include "../sprites/player.h"
 #include "../sprites/gate.h"
+#include "../sprites/heart.h"
 #include "../tools/text.h"
 #include "../tools/map.h"
 
@@ -28,21 +29,18 @@ public:
             {
                 game->gate = new Gate(renderer, obj.x, obj.y - SPRITE_HEIGHT);
                 game->displayCarrot = new Carrot(
-                    renderer, 
+                    renderer,
                     obj.x,
-                    obj.y - SPRITE_HEIGHT - 4, 0.5
-                );
+                    obj.y - SPRITE_HEIGHT - 4, 0.5);
                 game->displayCarrot->rect.x += game->displayCarrot->rect.w / 2;
                 game->pointsText = new Text(
                     renderer, "0",
                     obj.x, obj.y - SPRITE_HEIGHT * 1.7,
-                    WHITE, textSize
-                );
+                    WHITE, textSize);
                 game->carrotsText = new Text(
                     renderer, "0",
                     obj.x, obj.y - SPRITE_HEIGHT * 1.7,
-                    WHITE, textSize
-                );
+                    WHITE, textSize);
                 game->carrotsText->rect.x += game->displayCarrot->rect.w * 2;
             }
             else if (name == "carrot")
@@ -64,6 +62,14 @@ public:
                 };
                 createPlatform<Spike>(obj, createSpike, game->spikes);
             }
+        }
+        for (int i = 0; i < game->player->HP; i++)
+        {
+            Heart *heart = new Heart(
+                renderer,
+                SPRITE_WIDTH + (i * SPRITE_WIDTH), SPRITE_HEIGHT
+            );
+            game->hearts.emplace_back(heart);
         }
     }
 

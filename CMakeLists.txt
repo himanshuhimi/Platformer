@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 4.1)
-project(Platformer)
+set (gameName "Game")
+project(${gameName})
 
 set(LIBRARIES
     SDL3

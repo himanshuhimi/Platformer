@@ -13,7 +13,7 @@ public:
     vector<Grass *> collidedGrasses;
     Cooldown jumpCooldown = {1.0f};
     Vector2D spawnPos;
-    int points = 0, HP = 3, dashMultiplier = 4;
+    int points = 0, HP = 3, healthPoints = HP, dashMultiplier = 4;
     float jumpForce, gravity;
     bool spacePressed, win;
     struct State
@@ -24,6 +24,6 @@ public:
     void handle(double deltaTime, const vector<Grass *> &grasses);
     void render();
     void respawn();
-    void damage(int healthPoints = 1);
+    void damage(int deductingPoints = 1);
     void kill();
 };

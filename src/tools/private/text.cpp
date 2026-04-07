@@ -7,7 +7,10 @@ Text::Text(
     float y,
     SDL_Color color,
     int pixelSize,
-    string fontSource) : renderer(renderer), x(x), y(y), pixelSize(pixelSize), color(color)
+    string fontSource,
+    bool underlined
+) : 
+renderer(renderer), x(x), y(y), pixelSize(pixelSize), color(color), underlined(underlined)
 {
     pixelSize *= SCALE;
     font = TTF_OpenFont(fontSource.c_str(), pixelSize);
@@ -28,6 +31,13 @@ Text::Text(
 void Text::render()
 {
     SDL_RenderTexture(renderer, textTexture, nullptr, &rect);
+    if (underlined)
+    {
+        int y = rect.y + rect.h;
+        int x = rect.x;
+        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+        SDL_RenderLine(renderer, x, y, x + rect.w, y);
+    }
 }
 
 void Text::updateData(string newData)

@@ -20,7 +20,6 @@ bool Button::hovered(SDL_Event event)
 
 bool Button::clicked(SDL_Event event)
 {
-
     return (
         event.type == SDL_EVENT_MOUSE_BUTTON_UP &&
         event.button.button == SDL_BUTTON_LEFT && hovered(event));
@@ -28,6 +27,7 @@ bool Button::clicked(SDL_Event event)
 
 void Button::handle(double deltaTime, SDL_Event event)
 {
+    text->underlined = hovered(event);
     if (clicked(event))
         func();
 }

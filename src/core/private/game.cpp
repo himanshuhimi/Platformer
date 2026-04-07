@@ -16,6 +16,20 @@ Game::Game()
         WHITE,
         60
     );
+    titleText = new Text(
+        renderer, TITLE,
+        WIDTH / 2, 60,
+        GREY,
+        48 * SCALE,
+        "assets/fonts/title.ttf",
+        true
+    );
+    pausedText = new Text(
+        renderer, "PAUSED!",
+        WIDTH / 2, 60,
+        GREY,
+        48 * SCALE
+    );
     active = true;
 }
 
@@ -35,6 +49,9 @@ void Game::handle()
             if (event.type == CLOUD_EVENT)
                 clouds.emplace_back(new Cloud(renderer));
             break;
+        case SDL_EVENT_KEY_UP:
+            if (event.key.key == SDLK_ESCAPE && state == States::playing)
+                update(States::paused);
         }
         ui->handle(event);
     }
@@ -49,6 +66,15 @@ void Game::handle()
         if (player != nullptr)
             player->handle(deltaTime, grasses);
         handleCollision();
+        for (int i = 0; i < hearts.size(); i++)
+        {
+            int HP = player->HP;
+            if (i >= HP)
+            {
+                Heart *heart = hearts.at(i);
+                heart->state.broken = true;
+            }
+        }
     }
 }
 
@@ -58,8 +84,22 @@ void Game::render()
     SDL_RenderClear(renderer);
     for (Cloud *cloud : clouds)
         cloud->render();
-    if (state == States::playing)
+    ui->render();
+    switch (state)
     {
+    case States::home:
+        titleText->render();
+        break;
+    case States::playing:
+        for (Heart *heart : hearts)
+        {
+            RenderRectangle(
+                renderer, BLACK,
+                heart->rect.w, heart->rect.h,
+                heart->rect.x + heart->rect.w / 2, heart->rect.y, 6.0f
+            );
+            heart->render();
+        }
         if (currentLevel != nullptr)
             currentLevel->render();
         if (gate != nullptr)
@@ -105,8 +145,13 @@ void Game::render()
                 levelUpText->updateAlpha(levelUpTextAlpha);
             }
         }
+        break;
+    case States::paused:
+        if (pausedText != nullptr)
+            pausedText->render();
+        break;
     }
-    ui->render();
+    (state == States::playing) ? SDL_HideCursor() : SDL_ShowCursor();
     SDL_RenderPresent(renderer);
 }
 
@@ -218,6 +263,12 @@ void Game::clear()
             delete cloud;
         clouds.clear();
     }
+    if (!hearts.empty())
+    {
+        for (Heart *heart : hearts)
+            delete heart;
+        hearts.clear();
+    }
     if (player != nullptr)
     {
         delete player;
@@ -285,6 +336,9 @@ vector<string> Game::UIElements<T>::getButtonLabels()
     case States::completion:
         res = {"HOME"};
         break;
+    case States::paused:
+        res = {"CONTINUE", "HOME", "QUIT"};
+        break;
     }
     return res;
 }
@@ -304,7 +358,11 @@ unordered_map<string, function<void()>> Game::UIElements<T>::getButtonFunctions(
          {
              game->update(States::home);
              game->level = 0;
-         }}};
+         }},
+        {"CONTINUE", [this]()
+        {
+            game->update(States::playing);
+        }}};
 }
 
 template <typename T>

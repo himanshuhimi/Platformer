@@ -12,6 +12,7 @@ public:
     SDL_FRect rect;
     SDL_Color color;
     int pixelSize = 0, x = 0, y = 0, alpha = 255;
+    bool underlined = false;
     Text(
         SDL_Renderer *renderer,
         string data,
@@ -19,7 +20,9 @@ public:
         float y,
         SDL_Color color,
         int pixelSize = 24,
-        string fontSource = "assets/fonts/normal.ttf");
+        string fontSource = "assets/fonts/normal.ttf",
+        bool underlined = false
+    );
     void render();
     void updateData(string newData);
     void updateAlpha(int newAlpha);

@@ -55,9 +55,9 @@ void Player::respawn()
     Vector = {0, 0};
 }
 
-void Player::damage(int healthPoints)
+void Player::damage(int deductingPoints)
 {
-    HP -= healthPoints;
+    HP -= deductingPoints;
     if (HP <= 0)
         kill();
     else
