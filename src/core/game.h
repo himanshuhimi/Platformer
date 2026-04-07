@@ -23,7 +23,8 @@ public:
     vector<Heart *> hearts;
     SDL_FRect displayRect;
     Text *pointsText = nullptr, *carrotsText = nullptr, *levelUpText = nullptr,
-        *titleText = nullptr, *pausedText = nullptr;
+         *titleText = nullptr, *pausedText = nullptr, *completionText = nullptr,
+         *gameOverText = nullptr;
     bool active = false;
     double deltaTime = 0.0;
     int level = 0, totalCarrots = 0;
@@ -58,9 +59,9 @@ private:
         void handle(SDL_Event);
         void render();
     };
-    UIElements<Game*>* ui;
+    UIElements<Game *> *ui;
     void loadLevels();
     void handleCollision();
     void updateLevel();
-    static Uint32 cloudTimerCallback(void* userdata, SDL_TimerID id, Uint32 interval);
+    static Uint32 cloudTimerCallback(void *userdata, SDL_TimerID id, Uint32 interval);
 };

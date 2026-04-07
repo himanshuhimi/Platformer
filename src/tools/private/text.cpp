@@ -8,9 +8,7 @@ Text::Text(
     SDL_Color color,
     int pixelSize,
     string fontSource,
-    bool underlined
-) : 
-renderer(renderer), x(x), y(y), pixelSize(pixelSize), color(color), underlined(underlined)
+    bool underlined) : renderer(renderer), x(x), y(y), pixelSize(pixelSize), color(color), underlined(underlined)
 {
     pixelSize *= SCALE;
     font = TTF_OpenFont(fontSource.c_str(), pixelSize);

@@ -23,10 +23,17 @@ file(GLOB_RECURSE PRIVATE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*/private/*.cpp
 )
 
-add_executable(${PROJECT_NAME}
-    main.cpp
-    ${PRIVATE_SOURCES}
-)
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_executable(${PROJECT_NAME} WIN32
+        main.cpp
+        ${PRIVATE_SOURCES}
+    )
+else()
+    add_executable(${PROJECT_NAME}
+        main.cpp
+        ${PRIVATE_SOURCES}
+    )
+endif()
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE src include

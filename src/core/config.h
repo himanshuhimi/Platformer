@@ -21,7 +21,7 @@ namespace fs = std::filesystem;
 
 extern const char *TITLE;
 extern int VERSION, DEF_WIDTH, DEF_HEIGHT, WIDTH, HEIGHT, SCALE;
-extern float SPRITE_WIDTH, SPRITE_HEIGHT;
+extern float SPRITE_WIDTH, SPRITE_HEIGHT, LABEL_HEIGHT;
 extern SDL_Color WHITE;
 extern SDL_Color GREY;
 extern SDL_Color BLACK;

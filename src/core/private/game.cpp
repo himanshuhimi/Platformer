@@ -14,20 +14,29 @@ Game::Game()
         renderer, "LEVEL UP!",
         WIDTH / 2, HEIGHT / 2,
         WHITE,
-        60
-    );
+        60);
     titleText = new Text(
         renderer, TITLE,
-        WIDTH / 2, 60,
+        WIDTH / 2, LABEL_HEIGHT,
         GREY,
         48 * SCALE,
         "assets/fonts/title.ttf",
-        true
-    );
+        true);
     pausedText = new Text(
         renderer, "PAUSED!",
-        WIDTH / 2, 60,
+        WIDTH / 2, LABEL_HEIGHT,
         GREY,
+        48 * SCALE);
+    completionText = new Text(
+        renderer, "COMPLETION!",
+        WIDTH / 2, LABEL_HEIGHT,
+        GREY,
+        24 * SCALE);
+    completionText->rect.y += titleText->rect.y;
+    gameOverText = new Text(
+        renderer, "GAME OVER!",
+        WIDTH / 2, LABEL_HEIGHT,
+        GREY, 
         48 * SCALE
     );
     active = true;
@@ -75,6 +84,8 @@ void Game::handle()
                 heart->state.broken = true;
             }
         }
+        if (player->HP <= 0)
+            update(States::over);
     }
 }
 
@@ -96,8 +107,7 @@ void Game::render()
             RenderRectangle(
                 renderer, BLACK,
                 heart->rect.w, heart->rect.h,
-                heart->rect.x + heart->rect.w / 2, heart->rect.y, 6.0f
-            );
+                heart->rect.x + heart->rect.w / 2, heart->rect.y, 6.0f);
             heart->render();
         }
         if (currentLevel != nullptr)
@@ -110,8 +120,7 @@ void Game::render()
                 SPRITE_WIDTH * 2, SPRITE_HEIGHT / 2,
                 SPRITE_WIDTH / 2 + gate->Position.x,
                 gate->Position.y - SPRITE_HEIGHT / 2 - 4,
-                6
-            );
+                6);
         }
         if (!carrots.empty())
             for (Carrot *carrot : carrots)
@@ -134,10 +143,9 @@ void Game::render()
                 intermissionComplete = true;
                 intermissionRadius = 0;
             }
-            DrawFilledCircle(renderer, 
-                (int)WIDTH / 2, (int)HEIGHT / 2, 
-                intermissionRadius
-            );
+            DrawFilledCircle(renderer,
+                             (int)WIDTH / 2, (int)HEIGHT / 2,
+                             intermissionRadius);
             if (levelUpText != nullptr)
             {
                 levelUpTextAlpha++;
@@ -149,6 +157,16 @@ void Game::render()
     case States::paused:
         if (pausedText != nullptr)
             pausedText->render();
+        break;
+    case States::completion:
+        if (titleText != nullptr)
+            titleText->render();
+        if (completionText != nullptr)
+            completionText->render();
+        break;
+    case States::over:
+        if (gameOverText != nullptr)
+            gameOverText->render();
         break;
     }
     (state == States::playing) ? SDL_HideCursor() : SDL_ShowCursor();
@@ -334,10 +352,13 @@ vector<string> Game::UIElements<T>::getButtonLabels()
         res = {"PLAY", "QUIT"};
         break;
     case States::completion:
-        res = {"HOME"};
+        res = {"PLAY AGAIN", "HOME", "QUIT"};
         break;
     case States::paused:
         res = {"CONTINUE", "HOME", "QUIT"};
+        break;
+    case States::over:
+        res = {"TRY AGAIN", "HOME", "QUIT"};
         break;
     }
     return res;
@@ -352,6 +373,16 @@ unordered_map<string, function<void()>> Game::UIElements<T>::getButtonFunctions(
              game->update(States::playing);
              game->loadLevels();
          }},
+        {"PLAY AGAIN", [this]()
+         {
+             game->update(States::playing);
+             game->loadLevels();
+         }},
+        {"TRY AGAIN", [this]()
+         {
+             game->update(States::playing);
+             game->loadLevels();
+         }},
         {"QUIT", [this]()
          { game->terminate(); }},
         {"HOME", [this]()
@@ -360,9 +391,9 @@ unordered_map<string, function<void()>> Game::UIElements<T>::getButtonFunctions(
              game->level = 0;
          }},
         {"CONTINUE", [this]()
-        {
-            game->update(States::playing);
-        }}};
+         {
+             game->update(States::playing);
+         }}};
 }
 
 template <typename T>

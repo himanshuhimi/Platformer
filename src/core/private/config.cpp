@@ -5,7 +5,7 @@ int VERSION = 1.0;
 const char *TITLE = "Bunny Adventure";
 int DEF_WIDTH{640}, DEF_HEIGHT{360}, WIDTH{640}, HEIGHT{360};
 int SCALE{(int)sqrt((WIDTH * HEIGHT) / (DEF_WIDTH * DEF_HEIGHT))};
-float SPRITE_WIDTH{32.0f}, SPRITE_HEIGHT{32.0f};
+float SPRITE_WIDTH{32.0f}, SPRITE_HEIGHT{32.0f}, LABEL_HEIGHT{60.0f};
 SDL_Color WHITE = {255, 255, 255, 255};
 SDL_Color GREY = {60, 60, 60, 255};
 SDL_Color BLACK = {0, 0, 0, 255};
@@ -101,9 +101,11 @@ SDL_FRect RenderRectangle(
                      borderRadius);
     return center;
 }
-int randint(int rangeBegin, int rangeEnd) {
+int randint(int rangeBegin, int rangeEnd)
+{
     static bool seeded = false;
-    if (!seeded) {
+    if (!seeded)
+    {
         std::srand(static_cast<unsigned>(std::time(nullptr)));
         seeded = true;
     }

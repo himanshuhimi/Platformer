@@ -67,8 +67,7 @@ public:
         {
             Heart *heart = new Heart(
                 renderer,
-                SPRITE_WIDTH + (i * SPRITE_WIDTH), SPRITE_HEIGHT
-            );
+                SPRITE_WIDTH + (i * SPRITE_WIDTH), SPRITE_HEIGHT);
             game->hearts.emplace_back(heart);
         }
     }
