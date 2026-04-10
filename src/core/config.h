@@ -10,6 +10,7 @@
 #include <cctype>
 #include <functional>
 #include <windows.h>
+#include <sqlite3.h>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -29,9 +30,10 @@ enum States
 {
     home,
     playing,
-    completion,
+    settings,
     paused,
-    over
+    over,
+    completion
 };
 struct Image
 {

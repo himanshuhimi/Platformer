@@ -2,6 +2,12 @@
 
 Game::Game()
 {
+    db = new Database("main");
+    db->createTable("settings", "key TEXT PRIMARY KEY, value TEXT NOT NULL");
+    db->tables["settings"]->insert(
+        "(key, value)",
+        "('music_volume', '0.8'), ('sfx_volume', '0.7')"
+    );
     if (!SDL_Init(SDL_INIT_VIDEO))
         log("SDL Uninitialized: " + (string)SDL_GetError());
     if (!TTF_Init())
@@ -349,7 +355,7 @@ vector<string> Game::UIElements<T>::getButtonLabels()
     switch (game->state)
     {
     case States::home:
-        res = {"PLAY", "QUIT"};
+        res = {"PLAY", "SETTINGS", "QUIT"};
         break;
     case States::completion:
         res = {"PLAY AGAIN", "HOME", "QUIT"};
@@ -367,33 +373,21 @@ vector<string> Game::UIElements<T>::getButtonLabels()
 template <typename T>
 unordered_map<string, function<void()>> Game::UIElements<T>::getButtonFunctions()
 {
+    auto playFunc = [this]() {
+        game->update(States::playing);
+        game->loadLevels();
+    };
     return {
-        {"PLAY", [this]()
-         {
-             game->update(States::playing);
-             game->loadLevels();
-         }},
-        {"PLAY AGAIN", [this]()
-         {
-             game->update(States::playing);
-             game->loadLevels();
-         }},
-        {"TRY AGAIN", [this]()
-         {
-             game->update(States::playing);
-             game->loadLevels();
-         }},
-        {"QUIT", [this]()
-         { game->terminate(); }},
+        {"PLAY", playFunc}, {"PLAY AGAIN", playFunc}, {"TRY AGAIN", playFunc},
+        {"QUIT", [this]() { game->terminate(); }},
         {"HOME", [this]()
          {
              game->update(States::home);
              game->level = 0;
          }},
-        {"CONTINUE", [this]()
-         {
-             game->update(States::playing);
-         }}};
+        {"CONTINUE", [this](){game->update(States::playing);}},
+        {"SETTINGS", [this](){game->update(States::settings);}}
+    };
 }
 
 template <typename T>

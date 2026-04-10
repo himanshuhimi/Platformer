@@ -42,6 +42,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
     ${LINK_TARGETS}
+    sqlite3
 )
 foreach(directory ${DIRECTORIES})
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
