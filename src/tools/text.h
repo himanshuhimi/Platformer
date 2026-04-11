@@ -9,7 +9,7 @@ public:
     TTF_Font *font = nullptr;
     SDL_Surface *textSurface = nullptr;
     SDL_Texture *textTexture = nullptr;
-    SDL_FRect rect;
+    FRect rect;
     SDL_Color color;
     int pixelSize = 0, x = 0, y = 0, alpha = 255;
     bool underlined = false;

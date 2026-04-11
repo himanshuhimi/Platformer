@@ -9,6 +9,6 @@ public:
     sqlite3 *db = nullptr;
     unordered_map<string, Table *> tables;
     Database(string source);
-    void createTable(string name, string columns);
+    Table *createTable(string name, string columns);
     Table *findTable(string name);
 };

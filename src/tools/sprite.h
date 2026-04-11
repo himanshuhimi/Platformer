@@ -7,7 +7,7 @@ class Sprite
 public:
     SDL_Renderer *renderer = nullptr;
     Vector2D Vector, Position;
-    SDL_FRect rect;
+    FRect rect;
     Image *image;
     vector<Image> images;
     int speed = 0;

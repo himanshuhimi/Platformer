@@ -8,7 +8,7 @@ Table::Table(sqlite3 *db, string name, string columns) : db(db), name(name)
 
 int Table::insert(string what, string values)
 {
-    string sql = "INSERT INTO " + name + " " + what + " VALUES " + values;
+    string sql = "INSERT INTO " + name + " (" + what + ") VALUES " + values;
     return sqlite3_exec(db, sql.c_str(), 0, 0, 0);
 }
 

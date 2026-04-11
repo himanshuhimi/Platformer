@@ -6,10 +6,11 @@ Database::Database(string source)
         log("Database Uninitialized: " + source);  
 }
 
-void Database::createTable(string name, string columns)
+Table *Database::createTable(string name, string columns)
 {
     Table *table = new Table(db, name, columns);
     tables[name] = table;
+    return table;
 }
 
 Table *Database::findTable(string name)

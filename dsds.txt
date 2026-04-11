@@ -1,3 +1,240 @@
+#include "../sprite.h"
+
+Sprite::Sprite(SDL_Renderer *renderer, string imageSource, float x, float y)
+    : renderer(renderer)
+{
+    Position = Vector2D(x * scale, y * scale);
+    rect.x = Position.x;
+    rect.y = Position.y;
+    image = new Image(renderer, "assets/images/" + imageSource);
+}
+
+void Sprite::handle(double deltaTime)
+{
+    Position.x += Vector.x * deltaTime;
+    Position.y += Vector.y * deltaTime;
+    rect.x = Position.x;
+    rect.y = Position.y;
+}
+
+void Sprite::render()
+{
+    renderTexture(renderer, image->texture, nullptr, rect);
+}
+#include "../text.h"
+
+Text::Text(
+    SDL_Renderer *renderer,
+    string data,
+    float x,
+    float y,
+    SDL_Color color,
+    int pixelSize,
+    string fontSource,
+    bool underlined)
+    : renderer(renderer), x(x), y(y),
+      pixelSize(pixelSize), color(color), underlined(underlined)
+{
+    pixelSize *= scale;
+    font = TTF_OpenFont(fontSource.c_str(), pixelSize);
+    if (!font)
+        log("Font Uninitialized: " + fontSource);
+    textSurface = TTF_RenderText_Blended(
+        font,
+        data.c_str(),
+        data.size(),
+        color);
+    textTexture = createTextureFromSurface(renderer, textSurface);
+    SDL_DestroySurface(textSurface);
+    SDL_GetTextureSize(textTexture, &rect.w, &rect.h);
+    rect.x = x - rect.w / 2;
+    rect.y = y;
+}
+
+void Text::render()
+{
+    renderTexture(renderer, textTexture, nullptr, rect);
+    if (underlined)
+    {
+        int y = rect.y + rect.h;
+        int x = rect.x;
+        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+        SDL_RenderLine(renderer, x, y, x + rect.w, y);
+    }
+}
+
+void Text::updateData(string newData)
+{
+    if (textTexture)
+        SDL_DestroyTexture(textTexture);
+    textSurface = TTF_RenderText_Blended(
+        font,
+        newData.c_str(),
+        newData.size(),
+        color);
+    textTexture = createTextureFromSurface(renderer, textSurface);
+}
+
+void Text::updateAlpha(int newAlpha)
+{
+    alpha = newAlpha;
+    if (textTexture)
+        SDL_SetTextureAlphaMod(textTexture, alpha);
+}
+#include "../config.h"
+
+const char *TITLE = "Bunny Adventure";
+
+int WIDTH = 0, HEIGHT = 0;
+float scaleX = 1, scaleY = 1, scale = 1;
+float SPRITE_WIDTH = 0, SPRITE_HEIGHT = 0, LABEL_HEIGHT = 0;
+const int VERSION = 1.0, DEF_WIDTH = 640, DEF_HEIGHT = 360;
+SDL_Color WHITE = {255, 255, 255, 255};
+SDL_Color GREY = {60, 60, 60, 255};
+SDL_Color BLACK = {0, 0, 0, 255};
+Image::Image(SDL_Renderer *renderer, string source) : source(source)
+{
+    texture = IMG_LoadTexture(renderer, source.c_str());
+    if (!texture)
+        log("Texture Uninitialized: " + source);
+    else
+        SDL_GetTextureSize(texture, &width, &height);
+}
+Image::~Image()
+{
+    if (texture)
+        SDL_DestroyTexture(texture);
+}
+FRect::FRect(float x, float y, float w, float h)
+{
+    this->x = x * scale;
+    this->y = y * scale;
+    this->w = w * scale;
+    this->h = h * scale;
+
+    originalX = x;
+    originalY = y;
+    originalW = w;
+    originalH = h;
+}
+void loadScales()
+{
+    scaleX = (float)WIDTH / DEF_WIDTH;
+    scaleY = (float)HEIGHT / DEF_HEIGHT;
+    scale = std::min(scaleX, scaleY);
+    SPRITE_WIDTH = 32.0f * scaleX;
+    SPRITE_HEIGHT = 32.0f * scaleY;
+    LABEL_HEIGHT = 60.0f * scaleY;
+};
+void log(string message)
+{
+    using std::cout, std::endl;
+    cout << "[LOG] " << message << endl;
+};
+int randint(int rangeBegin, int rangeEnd)
+{
+    static bool seeded = false;
+    if (!seeded)
+    {
+        std::srand(static_cast<unsigned>(std::time(nullptr)));
+        seeded = true;
+    }
+    return rangeBegin + std::rand() % (rangeEnd - rangeBegin + 1);
+};
+bool checkRectIntersection(FRect &rectA, FRect &rectB)
+{
+    SDL_FRect SDL_RectA = SDL_FRect{rectA.x, rectA.y, rectA.w, rectA.h};
+    SDL_FRect SDL_RectB = SDL_FRect{rectB.x, rectB.y, rectB.w, rectB.h};
+    return SDL_HasRectIntersectionFloat(&SDL_RectA, &SDL_RectB);
+};
+bool renderTexture(
+    SDL_Renderer *renderer,
+    SDL_Texture *texture,
+    const FRect *srcRect,
+    const FRect &dstRect)
+{
+    SDL_FRect sourceRect = {srcRect->x, srcRect->y, srcRect->w, srcRect->h};
+    SDL_FRect destinationRect = {dstRect.x, dstRect.y, dstRect.w, dstRect.h};
+    bool res = SDL_RenderTexture(renderer, texture, &sourceRect, &destinationRect);
+    if (!res)
+        log("No texture rendered");
+    return res;
+}
+void DrawFilledCircle(SDL_Renderer *renderer, int cx, int cy, int radius)
+{
+    for (int dy = -radius; dy <= radius; dy++)
+        for (int dx = -radius; dx <= radius; dx++)
+            if (dx * dx + dy * dy <= radius * radius)
+                SDL_RenderPoint(renderer, cx + dx, cy + dy);
+}
+FRect RenderRectangle(
+    SDL_Renderer *renderer,
+    SDL_Color color,
+    float width,
+    float height,
+    float x,
+    float y,
+    float borderRadius)
+{
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    x *= scaleX;
+    y *= scaleY;
+    width *= scaleX;
+    height *= scaleY;
+    borderRadius *= std::min(scaleX, scaleY);
+
+    SDL_FRect center = {
+        x - width / 2 + borderRadius,
+        y,
+        width - 2 * borderRadius,
+        height};
+    SDL_RenderFillRect(renderer, &center);
+
+    SDL_FRect left = {
+        x - width / 2,
+        y + borderRadius,
+        borderRadius,
+        height - 2 * borderRadius};
+    SDL_RenderFillRect(renderer, &left);
+
+    SDL_FRect right = {
+        x + width / 2 - borderRadius,
+        y + borderRadius,
+        borderRadius,
+        height - 2 * borderRadius};
+    SDL_RenderFillRect(renderer, &right);
+
+    DrawFilledCircle(renderer,
+                     x - width / 2 + borderRadius,
+                     y + borderRadius,
+                     borderRadius);
+
+    DrawFilledCircle(renderer,
+                     x + width / 2 - borderRadius,
+                     y + borderRadius,
+                     borderRadius);
+
+    DrawFilledCircle(renderer,
+                     x - width / 2 + borderRadius,
+                     y + height - borderRadius,
+                     borderRadius);
+
+    DrawFilledCircle(renderer,
+                     x + width / 2 - borderRadius,
+                     y + height - borderRadius,
+                     borderRadius);
+    return FRect{center.x, center.y, center.w, center.h};
+}
+SDL_Texture *createTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface)
+{
+    if (!surface)
+        log("Surface Uninitialized: \n" + (string)SDL_GetError());
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (!texture)
+        log("Texture Unconverted: \n" + (string)SDL_GetError());
+    return texture;
+}
+
 #include "../game.h"
 
 Game::Game()
@@ -16,7 +253,6 @@ Game::Game()
         log("Display Uninitialized: " + (string)SDL_GetError());
     SDL_GetWindowSize(window, &WIDTH, &HEIGHT);
     loadScales();
-    log(std::to_string(scale));
     ui = new UIElements(this);
     SDL_AddTimer(3000, cloudTimerCallback, this);
     levelUpText = new Text(
@@ -426,3 +662,6 @@ Game::~Game()
     TTF_Quit();
     SDL_Quit();
 }
+
+Not rendering any textures -> Sprite, Text. Using:
+SDL3, SDL3_TTF, SDL3_IMAGE, SDL3_MIXER, C++ 

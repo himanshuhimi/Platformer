@@ -3,12 +3,12 @@
 Sprite::Sprite(SDL_Renderer *renderer, string imageSource, float x, float y)
     : renderer(renderer)
 {
-    Position = Vector2D(x * SCALE, y * SCALE);
+    Position = Vector2D(x * scale, y * scale);
     rect.x = Position.x;
     rect.y = Position.y;
     image = new Image(renderer, "assets/images/" + imageSource);
-    rect.w = image->width * SCALE;
-    rect.h = image->height * SCALE;
+    rect.w = image->width * scale;
+    rect.h = image->height * scale;
 }
 
 void Sprite::handle(double deltaTime)
@@ -21,5 +21,5 @@ void Sprite::handle(double deltaTime)
 
 void Sprite::render()
 {
-    SDL_RenderTexture(renderer, image->texture, NULL, &rect);
+    renderTexture(renderer, image->texture, nullptr, rect);
 }

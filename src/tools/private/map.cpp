@@ -95,8 +95,8 @@ void Map::loadObjectGroup(XMLElement *child)
         object.y = objectElement->FloatAttribute("y");
         object.width = objectElement->FloatAttribute("width");
         object.height = objectElement->FloatAttribute("height");
-        object.width *= SCALE;
-        object.height *= SCALE;
+        object.width *= scale;
+        object.height *= scale;
         objectGroup.objects.push_back(object);
     }
 }
@@ -111,17 +111,17 @@ void Map::render()
             if (gid == 0)
                 continue;
             int index = gid - tileset.firstGID;
-            SDL_FRect src = {
+            FRect src = {
                 (float)((index % tileset.columns) * tileWidth),
                 (float)((index / tileset.columns) * tileHeight),
                 (float)tileWidth,
                 (float)tileHeight};
-            SDL_FRect dest = {
-                (float)((i % layer.width) * tileWidth * SCALE),
-                (float)((i / layer.width) * tileHeight * SCALE),
-                (float)(tileWidth * SCALE),
-                (float)(tileHeight * SCALE)};
-            SDL_RenderTexture(renderer, tileset.image->texture, &src, &dest);
+            FRect dest = {
+                (float)((i % layer.width) * tileWidth * scale),
+                (float)((i / layer.width) * tileHeight * scale),
+                (float)(tileWidth * scale),
+                (float)(tileHeight * scale)};
+            renderTexture(renderer, tileset.image->texture, &src, dest);
         }
     }
 }

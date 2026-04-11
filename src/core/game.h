@@ -3,6 +3,7 @@
 #include "config.h"
 #include "../tools/level.h"
 #include "../tools/database.h"
+#include "../tools/settings.h"
 #include "../sprites/cloud.h"
 #include "../sprites/heart.h"
 #include "../ui/button.h"
@@ -22,11 +23,12 @@ public:
     vector<Spike *> spikes;
     vector<Cloud *> clouds;
     vector<Heart *> hearts;
-    SDL_FRect displayRect;
+    FRect displayRect;
     Text *pointsText = nullptr, *carrotsText = nullptr, *levelUpText = nullptr,
          *titleText = nullptr, *pausedText = nullptr, *completionText = nullptr,
          *gameOverText = nullptr;
     Database *db = nullptr;
+    Settings *settingsData = nullptr;
     bool active = false;
     double deltaTime = 0.0;
     int level = 0, totalCarrots = 0;

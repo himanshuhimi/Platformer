@@ -2,9 +2,6 @@
 
 #include "../core/config.h"
 
-using Row = unordered_map<string, string>;
-using ResultSet = vector<Row>;
-
 class Table
 {
 public:

@@ -1,12 +1,21 @@
 #include "../player.h"
 
 Player::Player(SDL_Renderer *renderer, float x, float y)
-    : Sprite(renderer, "player.png", x, y), spawnPos{x, y}
+    : Sprite(renderer, "player/right.png", x, y), spawnPos{x, y}
 {
     state.movable = true;
-    speed = 100 * SCALE;
-    jumpForce = 490.0f * SCALE;
-    gravity = 980.0f * SCALE;
+    speed = 100 * scale;
+    jumpForce = 490.0f * scale;
+    gravity = 980.0f * scale;
+    lastDirection = Direction::Right;
+    rightImage = new Image(
+        renderer,
+        "assets/images/player/right.png"
+    );
+    leftImage = new Image(
+        renderer,
+        "assets/images/player/left.png"
+    );
 };
 
 void Player::handle(double deltaTime, const vector<Grass *> &grasses)
@@ -15,9 +24,13 @@ void Player::handle(double deltaTime, const vector<Grass *> &grasses)
         return;
     const bool *keys = SDL_GetKeyboardState(NULL);
     Vector.x = -((int)keys[SDL_SCANCODE_A] - (int)keys[SDL_SCANCODE_D]) * speed;
+    if (Vector.x > 0)
+        lastDirection = Direction::Right;
+    else if (Vector.x < 0)
+        lastDirection = Direction::Left;
     collidedGrasses.clear();
     for (Grass *grass : grasses)
-        if (SDL_HasRectIntersectionFloat(&rect, &grass->rect))
+        if (checkRectIntersection(rect, grass->rect))
             collidedGrasses.push_back(grass);
     state.jumping = collidedGrasses.empty();
     for (Grass *collided : collidedGrasses)
@@ -46,6 +59,10 @@ void Player::handle(double deltaTime, const vector<Grass *> &grasses)
 
 void Player::render()
 {
+    if (lastDirection == Direction::Right)
+        image = rightImage;
+    else
+        image = leftImage;
     Sprite::render();
 }
 

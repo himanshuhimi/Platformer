@@ -8,9 +8,11 @@ Text::Text(
     SDL_Color color,
     int pixelSize,
     string fontSource,
-    bool underlined) : renderer(renderer), x(x), y(y), pixelSize(pixelSize), color(color), underlined(underlined)
+    bool underlined)
+    : renderer(renderer), x(x), y(y),
+      pixelSize(pixelSize), color(color), underlined(underlined)
 {
-    pixelSize *= SCALE;
+    pixelSize *= scale;
     font = TTF_OpenFont(fontSource.c_str(), pixelSize);
     if (!font)
         log("Font Uninitialized: " + fontSource);
@@ -28,7 +30,7 @@ Text::Text(
 
 void Text::render()
 {
-    SDL_RenderTexture(renderer, textTexture, nullptr, &rect);
+    renderTexture(renderer, textTexture, nullptr, rect);
     if (underlined)
     {
         int y = rect.y + rect.h;

@@ -18,8 +18,15 @@ public:
     bool spacePressed, win;
     struct State
     {
-        bool movable = false, jumping = false;
+        bool movable = false;
+        bool jumping = false;
     } state;
+    enum class Direction
+    {
+        Left,
+        Right
+    } lastDirection;
+    Image *rightImage, *leftImage;
     Player(SDL_Renderer *renderer, float x, float y);
     void handle(double deltaTime, const vector<Grass *> &grasses);
     void render();
