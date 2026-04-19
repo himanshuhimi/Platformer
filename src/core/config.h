@@ -82,7 +82,7 @@ enum States
 {
     home,
     playing,
-    settings,
+    options,
     paused,
     over,
     completion

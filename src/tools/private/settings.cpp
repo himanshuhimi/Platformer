@@ -2,6 +2,16 @@
 
 Settings::Settings(Database *db) : db(db)
 {
+    options = {
+        {
+            "window",
+            {
+                "640x360",
+                "1280x720",
+                "1920x1080"
+            }
+        },
+    };
     vector<std::pair<string, string>> defaults = {
         {"window", "640x360"},
         {"Move Forward", "D"},

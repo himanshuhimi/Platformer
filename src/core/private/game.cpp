@@ -2,12 +2,13 @@
 
 Game::Game()
 {
-    db = new Database("main");
-    settingsData = new Settings(db);
-    string winSizeStr = settingsData->fetch("window");
-    size_t pos = winSizeStr.find('x');
-    WIDTH = std::stoi(winSizeStr.substr(0, pos));
-    HEIGHT = std::stoi(winSizeStr.substr(pos + 1));
+    // settings = new Settings(new Database("settings"));
+    // string winSizeStr = settings->fetch("window");
+    // size_t pos = winSizeStr.find('x');
+    // WIDTH = std::stoi(winSizeStr.substr(0, pos));
+    // HEIGHT = std::stoi(winSizeStr.substr(pos + 1));
+    WIDTH = 640;
+    HEIGHT = 360;
     if (!SDL_Init(SDL_INIT_VIDEO))
         log("SDL Uninitialized: " + (string)SDL_GetError());
     if (!TTF_Init())
@@ -16,7 +17,6 @@ Game::Game()
         log("Display Uninitialized: " + (string)SDL_GetError());
     SDL_GetWindowSize(window, &WIDTH, &HEIGHT);
     loadScales();
-    log(std::to_string(scale));
     ui = new UIElements(this);
     SDL_AddTimer(3000, cloudTimerCallback, this);
     levelUpText = new Text(
@@ -158,8 +158,8 @@ void Game::render()
             if (levelUpText != nullptr)
             {
                 levelUpTextAlpha++;
-                levelUpText->render();
                 levelUpText->updateAlpha(levelUpTextAlpha);
+                levelUpText->render();
             }
         }
         break;
@@ -358,7 +358,7 @@ vector<string> Game::UIElements<T>::getButtonLabels()
     switch (game->state)
     {
     case States::home:
-        res = {"PLAY", "SETTINGS", "QUIT"};
+        res = {"PLAY", "QUIT"};
         break;
     case States::completion:
         res = {"PLAY AGAIN", "HOME", "QUIT"};
@@ -389,7 +389,7 @@ unordered_map<string, function<void()>> Game::UIElements<T>::getButtonFunctions(
              game->level = 0;
          }},
         {"CONTINUE", [this](){game->update(States::playing);}},
-        {"SETTINGS", [this](){game->update(States::settings);}}
+        {"options", [this](){game->update(States::options);}}
     };
 }
 
